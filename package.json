@@ -1,5 +1,5 @@
 {
-  "name": "@vibe-coding/cli",
+  "name": "@vibe-coding-cli/cli",
   "version": "0.2.0",
   "description": "Secure project scaffolding for agent-assisted software development.",
   "repository": {
@@ -37,6 +37,9 @@
     "scaffolding",
     "cli"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "license": "MIT",
   "devDependencies": {
     "typescript": "^5.8.3"
