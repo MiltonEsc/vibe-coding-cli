@@ -10,7 +10,7 @@ A developer or technical lead who wants an agent-ready project structure, reusab
 
 ## Core experience
 
-1. Run `vibe init` with a preset or stack list.
+1. Run `vibe init` for the technology-neutral core, optionally with a preset, extensible stack list, or source prompt.
 2. Receive a readable repository structure without network side effects.
 3. Complete the requirements artifact and use `doctor` for feedback.
 4. Approve each stage with an accountable identity and evidence hashes.
@@ -24,6 +24,7 @@ A developer or technical lead who wants an agent-ready project structure, reusab
 - Portable: use AGENTS.md and SKILL.md conventions rather than a private prompt database.
 - Traceable: preserve ordered approvals and content hashes.
 - Composable: add only stack-relevant Skills while keeping an end-to-end orchestrator.
+- Progressive specialization: custom stacks remain valid metadata while known stacks add focused Skills and scoped files.
 - Fail closed: checksum, path, host, size, or audit failures stop remote installation.
 
 ## Information architecture

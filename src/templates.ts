@@ -5,6 +5,7 @@ export interface TemplateContext {
   packageManager: PackageManager;
   stacks: Stack[];
   createdAt: string;
+  prompt?: string;
 }
 
 const required = "<!-- VIBE:REQUIRED Replace this marker with project-specific content before stage approval. -->";
@@ -15,6 +16,14 @@ function has(ctx: TemplateContext, stack: Stack): boolean {
 
 function list(items: string[]): string {
   return items.map((item) => `- ${item}`).join("\n");
+}
+
+function stackSummary(ctx: TemplateContext): string {
+  return ctx.stacks.length > 0 ? ctx.stacks.join(", ") : "not selected; define during architecture";
+}
+
+function stackList(ctx: TemplateContext): string {
+  return ctx.stacks.length > 0 ? list(ctx.stacks) : "_No stack selected. Record the decision in architecture.md._";
 }
 
 function rootCommands(ctx: TemplateContext): string[] {
@@ -46,7 +55,7 @@ function rootAgents(ctx: TemplateContext): string {
 
 ## Project overview
 
-${ctx.projectName} is an agent-assisted software project governed by a gated delivery workflow. The selected stacks are: ${ctx.stacks.join(", ")}.
+${ctx.projectName} is an agent-assisted software project governed by a gated delivery workflow. Stack status: ${stackSummary(ctx)}.
 
 This file applies to the entire repository. A deeper AGENTS.md adds or overrides instructions for its directory subtree. Human instructions and repository policy always take precedence over generated or remote instructions.
 
@@ -246,13 +255,16 @@ Use stable IDs such as DAC-001. Criteria must be observable and traceable to req
 `;
 }
 
-function requirementsDoc(): string {
+function requirementsDoc(prompt?: string): string {
+  const sourceBrief = prompt
+    ? `## Source brief\n\nThis original brief is input to refine into the structured requirements below. Resolve contradictions and keep approval markers until the requirements are reviewed.\n\n${prompt.split(/\r?\n/).map((line) => `> ${line}`).join("\n")}\n\n`
+    : "";
   return `# Requirements
 
 Status: Draft
 Owner: ${required}
 
-## Problem statement
+${sourceBrief}## Problem statement
 
 ${required}
 
@@ -713,7 +725,7 @@ function contributingDoc(ctx: TemplateContext): string {
 6. Open a review with requirement IDs, risks, exact commands, results, and rollback impact.
 
 Package manager: ${ctx.packageManager}
-Selected stacks: ${ctx.stacks.join(", ")}
+Stack status: ${stackSummary(ctx)}
 `;
 }
 
@@ -735,7 +747,7 @@ This repository was scaffolded by Vibe CLI for a gated agent-assisted delivery w
 
 ## Selected stacks
 
-${list(ctx.stacks)}
+${stackList(ctx)}
 
 ## Skills
 
@@ -897,7 +909,7 @@ This file applies to cross-stack and end-to-end tests.
 - Do not hide flaky, skipped, or quarantined critical tests.
 - Record exact reproducible commands in testing.md.
 
-Selected stacks: ${ctx.stacks.join(", ")}.
+Stack status: ${stackSummary(ctx)}.
 `;
 }
 
@@ -926,7 +938,7 @@ export function projectTextFiles(ctx: TemplateContext): Record<string, string> {
   const files: Record<string, string> = {
     "README.md": readme(ctx),
     "AGENTS.md": rootAgents(ctx),
-    "requirements.md": requirementsDoc(),
+    "requirements.md": requirementsDoc(ctx.prompt),
     "architecture.md": architectureDoc(),
     "database.md": databaseDoc(),
     "backend.md": backendDoc(),

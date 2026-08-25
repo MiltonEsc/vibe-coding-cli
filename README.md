@@ -43,13 +43,13 @@ node dist/cli.js workflow status my-product
 From the packaged tarball:
 
 ```bash
-npm install -g ./vibe-cli-0.1.0.tgz
+npm install -g ./vibe-cli-0.2.0.tgz
 vibe init my-product --preset full-stack
 cd my-product
 vibe doctor
 ```
 
-The default `full-stack` preset selects Next.js, FastAPI, Supabase, and GitHub Actions. It also installs the React component Skill because Next.js uses React.
+With no `--preset` or `--stack`, Vibe creates the core contracts, workflow, and general Skills while deferring technology choices to the architecture stage. The explicit `full-stack` preset selects Next.js, FastAPI, Supabase, and GitHub Actions. It also installs the React component Skill because Next.js uses React.
 
 ## Presets and stacks
 
@@ -60,9 +60,10 @@ vibe init api-product --preset api
 vibe init mobile-product --preset mobile
 vibe init planning-only --preset docs
 vibe init custom-product --stack nextjs,nestjs,supabase,github-actions
+vibe init world-button --stack react,vite,hono,postgresql,redis,websockets --package-manager bun --prompt-file ./world-button.md
 ```
 
-Supported stack selectors:
+Known stack selectors with bundled specializations:
 
 - `nextjs`
 - `react`
@@ -72,11 +73,13 @@ Supported stack selectors:
 - `flutter`
 - `github-actions`
 
-Vibe rejects incompatible primary choices such as FastAPI and NestJS together, or Next.js and standalone React together.
+Custom lowercase stack identifiers are accepted and recorded in `.vibe/config.json`, `AGENTS.md`, and project documentation. They use the general stage Skills and do not generate specialized directories or validation commands. Known stacks progressively add their bundled Skill and scoped structure. Vibe rejects incompatible known primary choices such as FastAPI and NestJS together, or Next.js and standalone React together.
+
+Use `--prompt <text>` for a short brief or `--prompt-file <path>` for a substantial product prompt. The original brief is quoted in `requirements.md` as source material; Vibe does not guess architecture decisions or remove the review markers automatically.
 
 ## Generated structure
 
-A default project contains this shape:
+A project created with the `full-stack` preset contains this shape:
 
 ```text
 my-product/
@@ -256,7 +259,7 @@ vibe skills audit --json
 
 ```text
 vibe init [directory] [--preset name] [--stack a,b] [--package-manager name]
-                         [--force] [--dry-run]
+                         [--prompt text|--prompt-file path] [--force] [--dry-run]
 vibe doctor [directory] [--json]
 vibe workflow status [directory] [--json]
 vibe workflow approve <stage> [directory] --approver <identity> [--note text]

@@ -1,13 +1,14 @@
 import { cp, mkdir, readdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { DEFAULT_STACKS, STACK_SKILLS, STAGE_SKILLS } from "./constants.js";
+import { STACK_SKILLS, STAGE_SKILLS } from "./constants.js";
 import { BUNDLED_SKILLS_ROOT, exists, safeJoin } from "./paths.js";
 import { projectTextFiles } from "./templates.js";
-import { STACKS, STAGES, type PackageManager, type Stack, type VibeConfig, type WorkflowState } from "./types.js";
+import { STAGES, isKnownStack, type PackageManager, type Stack, type VibeConfig, type WorkflowState } from "./types.js";
 
 export interface InitOptions {
   stacks?: Stack[];
   packageManager: PackageManager;
+  prompt?: string;
   force?: boolean;
   dryRun?: boolean;
 }
@@ -21,12 +22,12 @@ export interface InitResult {
 }
 
 export function validateStacks(input: readonly string[]): Stack[] {
-  const unique = [...new Set(input)];
-  const invalid = unique.filter((value) => !STACKS.includes(value as Stack));
+  const unique = [...new Set(input.map((value) => value.trim().toLowerCase()).filter(Boolean))];
+  const invalid = unique.filter((value) => !/^[a-z0-9][a-z0-9._+#-]{0,63}$/.test(value));
   if (invalid.length > 0) {
-    throw new Error(`Unknown stack(s): ${invalid.join(", ")}. Supported: ${STACKS.join(", ")}`);
+    throw new Error(`Invalid stack identifier(s): ${invalid.join(", ")}. Use 1-64 lowercase letters, numbers, dots, plus signs, hashes, or hyphens.`);
   }
-  const stacks = unique as Stack[];
+  const stacks = unique;
   if (stacks.includes("fastapi") && stacks.includes("nestjs")) {
     throw new Error("Select only one primary backend: fastapi or nestjs.");
   }
@@ -39,7 +40,7 @@ export function validateStacks(input: readonly string[]): Stack[] {
 function selectedSkills(stacks: Stack[]): string[] {
   const skills = new Set<string>(["full-stack-app-builder", ...Object.values(STAGE_SKILLS)]);
   for (const stack of stacks) {
-    skills.add(STACK_SKILLS[stack]);
+    if (isKnownStack(stack)) skills.add(STACK_SKILLS[stack]);
   }
   if (stacks.includes("nextjs")) {
     skills.add("react-component-builder");
@@ -72,10 +73,10 @@ async function assertWritableTarget(root: string, force: boolean): Promise<void>
 export async function initializeProject(target: string, options: InitOptions): Promise<InitResult> {
   const root = path.resolve(target);
   const projectName = path.basename(root);
-  const stacks = validateStacks(options.stacks === undefined ? DEFAULT_STACKS : options.stacks);
+  const stacks = validateStacks(options.stacks ?? []);
   const skills = selectedSkills(stacks);
   const createdAt = new Date().toISOString();
-  const ctx = { projectName, packageManager: options.packageManager, stacks, createdAt };
+  const ctx = { projectName, packageManager: options.packageManager, stacks, createdAt, prompt: options.prompt };
   const textFiles = projectTextFiles(ctx);
 
   const config: VibeConfig = {

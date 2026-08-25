@@ -1,4 +1,4 @@
-import type { Stack, Stage } from "./types.js";
+import type { KnownStack, Stack, Stage } from "./types.js";
 
 export const DEFAULT_STACKS: Stack[] = [
   "nextjs",
@@ -18,7 +18,7 @@ export const STAGE_SKILLS: Record<Stage, string> = {
   deployment: "deployment-engineer",
 };
 
-export const STACK_SKILLS: Record<Stack, string> = {
+export const STACK_SKILLS: Record<KnownStack, string> = {
   nextjs: "nextjs-app-builder",
   react: "react-component-builder",
   fastapi: "fastapi-api-builder",

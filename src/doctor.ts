@@ -3,7 +3,8 @@ import path from "node:path";
 import { STACK_SKILLS, STAGE_SKILLS } from "./constants.js";
 import { auditSkillDirectory } from "./security.js";
 import { exists, findProjectRoot, readJson } from "./paths.js";
-import { STACKS, STAGES, type Stack, type VibeConfig, type WorkflowState } from "./types.js";
+import { STAGES, isKnownStack, type Stack, type VibeConfig, type WorkflowState } from "./types.js";
+import { validateStacks } from "./scaffold.js";
 
 export interface DoctorIssue {
   severity: "error" | "warning" | "info";
@@ -57,12 +58,16 @@ export async function runDoctor(start?: string): Promise<DoctorReport> {
 
   let config: VibeConfig | undefined;
   try {
-    config = await readJson<VibeConfig>(path.join(root, ".vibe", "config.json"));
-    const invalidStacks = config.stacks.filter((stack) => !STACKS.includes(stack));
-    if (invalidStacks.length > 0) {
-      issues.push({ severity: "error", path: ".vibe/config.json", message: `Unknown stacks: ${invalidStacks.join(", ")}` });
+    const candidate = await readJson<VibeConfig>(path.join(root, ".vibe", "config.json"));
+    if (!Array.isArray(candidate.stacks) || candidate.stacks.some((stack) => typeof stack !== "string")) {
+      throw new Error("stacks must be an array of identifiers");
     }
-    if (JSON.stringify(config.workflow.order) !== JSON.stringify(STAGES)) {
+    config = { ...candidate, stacks: validateStacks(candidate.stacks) };
+    const customStacks = config.stacks.filter((stack) => !isKnownStack(stack));
+    if (customStacks.length > 0) {
+      issues.push({ severity: "info", path: ".vibe/config.json", message: `Custom stacks use general Skills: ${customStacks.join(", ")}` });
+    }
+    if (JSON.stringify(candidate.workflow.order) !== JSON.stringify(STAGES)) {
       issues.push({ severity: "error", path: ".vibe/config.json", message: "Configured workflow order is not the mandatory Vibe order." });
     }
   } catch (error) {
@@ -98,7 +103,9 @@ export async function runDoctor(start?: string): Promise<DoctorReport> {
     }
 
     const requiredSkills = new Set<string>(["full-stack-app-builder", ...Object.values(STAGE_SKILLS)]);
-    for (const stack of config.stacks) requiredSkills.add(STACK_SKILLS[stack]);
+    for (const stack of config.stacks) {
+      if (isKnownStack(stack)) requiredSkills.add(STACK_SKILLS[stack]);
+    }
     if (config.stacks.includes("nextjs")) requiredSkills.add("react-component-builder");
     for (const skill of requiredSkills) {
       const skillRoot = path.join(root, ".agents", "skills", skill);

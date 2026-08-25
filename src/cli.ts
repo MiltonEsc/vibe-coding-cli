@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { readFile } from "node:fs/promises";
 import { DEFAULT_STACKS } from "./constants.js";
 import { runDoctor } from "./doctor.js";
 import { initializeProject, validateStacks } from "./scaffold.js";
@@ -6,7 +7,7 @@ import { addBundledSkill, auditInstalledSkills, installRemoteSkill, listBundledS
 import { approveStage, isStage, loadWorkflow, reopenStage, workflowRows } from "./workflow.js";
 import { STACKS, type PackageManager, type Stack } from "./types.js";
 
-const VERSION = "0.1.0";
+const VERSION = "0.2.0";
 const PRESETS: Record<string, Stack[]> = {
   "full-stack": [...DEFAULT_STACKS],
   web: ["nextjs", "supabase", "github-actions"],
@@ -65,8 +66,9 @@ function parseStackList(value: string): Stack[] {
   return validateStacks(value.split(",").map((item) => item.trim()).filter(Boolean));
 }
 
-function resolveStacks(preset: string, explicit?: Stack[]): Stack[] {
+function resolveStacks(preset?: string, explicit?: Stack[]): Stack[] {
   if (explicit) return explicit;
+  if (!preset) return [];
   const stacks = PRESETS[preset];
   if (!stacks) throw new Error(`Unknown preset: ${preset}. Available: ${Object.keys(PRESETS).join(", ")}`);
   return [...stacks];
@@ -85,7 +87,7 @@ function printRows(rows: Array<Record<string, string>>): void {
 }
 
 function printRootHelp(): void {
-  console.log(`vibe ${VERSION}\n\nSecure scaffolding and gated workflows for agent-assisted software projects.\n\nUsage:\n  vibe init [directory] [options]\n  vibe doctor [directory] [--json]\n  vibe workflow status [directory] [--json]\n  vibe workflow approve <stage> [directory] --approver <identity> [--note <text>]\n  vibe workflow reopen <stage> [directory] --reason <text>\n  vibe skills list [directory]\n  vibe skills bundled\n  vibe skills add <name> [directory] [--force]\n  vibe skills audit [directory] [--json]\n  vibe skills catalog [--json]\n  vibe skills install <catalog-id> [directory] [--force]\n\nInit presets: ${Object.keys(PRESETS).join(", ")}\nStacks: ${STACKS.join(", ")}\n`);
+  console.log(`vibe ${VERSION}\n\nSecure scaffolding and gated workflows for agent-assisted software projects.\n\nUsage:\n  vibe init [directory] [options]\n  vibe doctor [directory] [--json]\n  vibe workflow status [directory] [--json]\n  vibe workflow approve <stage> [directory] --approver <identity> [--note <text>]\n  vibe workflow reopen <stage> [directory] --reason <text>\n  vibe skills list [directory]\n  vibe skills bundled\n  vibe skills add <name> [directory] [--force]\n  vibe skills audit [directory] [--json]\n  vibe skills catalog [--json]\n  vibe skills install <catalog-id> [directory] [--force]\n\nInit presets: ${Object.keys(PRESETS).join(", ")}\nKnown stacks: ${STACKS.join(", ")}\nCustom stack identifiers are also accepted.\n`);
 }
 
 function requirePositional(values: string[], index: number, label: string): string {
@@ -96,25 +98,29 @@ function requirePositional(values: string[], index: number, label: string): stri
 
 async function runInit(tokens: string[]): Promise<void> {
   const parsed = parseArgs(tokens,
-    { "--preset": "preset", "-p": "preset", "--stack": "stack", "-s": "stack", "--package-manager": "packageManager" },
+    { "--preset": "preset", "-p": "preset", "--stack": "stack", "-s": "stack", "--package-manager": "packageManager", "--prompt": "prompt", "--prompt-file": "promptFile" },
     { "--force": "force", "--dry-run": "dryRun", "--help": "help", "-h": "help" },
   );
   if (parsed.flags.has("help")) {
-    console.log("Usage: vibe init [directory] [--preset full-stack|web|api|mobile|docs] [--stack a,b] [--package-manager pnpm|npm|yarn|bun] [--force] [--dry-run]");
+    console.log("Usage: vibe init [directory] [--preset full-stack|web|api|mobile|docs] [--stack a,b] [--package-manager pnpm|npm|yarn|bun] [--prompt text|--prompt-file path] [--force] [--dry-run]");
     return;
   }
   if (parsed.positional.length > 1) throw new Error("init accepts at most one directory argument.");
   const directory = parsed.positional[0] ?? ".";
-  const preset = parsed.values.preset ?? "full-stack";
-  const stacks = resolveStacks(preset, parsed.values.stack ? parseStackList(parsed.values.stack) : undefined);
+  if (parsed.values.prompt && parsed.values.promptFile) throw new Error("Use --prompt or --prompt-file, not both.");
+  const stacks = resolveStacks(parsed.values.preset, parsed.values.stack ? parseStackList(parsed.values.stack) : undefined);
+  const prompt = parsed.values.promptFile ? await readFile(parsed.values.promptFile, "utf8") : parsed.values.prompt;
+  if (prompt && Buffer.byteLength(prompt, "utf8") > 1024 * 1024) throw new Error("Prompt exceeds the 1 MiB limit.");
+  if (prompt?.includes("\0")) throw new Error("Prompt contains unsupported null bytes.");
   const result = await initializeProject(directory, {
     stacks,
     packageManager: parsePackageManager(parsed.values.packageManager ?? "pnpm"),
+    prompt,
     force: parsed.flags.has("force"),
     dryRun: parsed.flags.has("dryRun"),
   });
   console.log(`${result.dryRun ? "Planned" : "Created"} Vibe project: ${result.root}`);
-  console.log(`Stacks: ${result.stacks.length > 0 ? result.stacks.join(", ") : "documentation-only"}`);
+  console.log(`Stacks: ${result.stacks.length > 0 ? result.stacks.join(", ") : "not selected"}`);
   console.log(`Skills: ${result.skills.length}`);
   console.log(`Files: ${result.files.length}`);
   if (!result.dryRun) console.log("Next: complete requirements.md, run 'vibe doctor', then request requirements approval.");

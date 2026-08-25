@@ -1,6 +1,6 @@
 {
   "name": "@vibe-coding/cli",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Secure project scaffolding for agent-assisted software development.",
   "repository": {
     "type": "git",

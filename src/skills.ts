@@ -93,7 +93,7 @@ async function downloadCatalogEntry(entry: RemoteCatalogEntry, catalog: RemoteCa
     const target = safeJoin(destination, file.path);
     const response = await fetch(sourceUrl, {
       redirect: "follow",
-      headers: { "user-agent": "vibe-cli/0.1.0" },
+      headers: { "user-agent": "vibe-cli/0.2.0" },
     });
     if (!response.ok) {
       throw new Error(`Failed to download ${entry.id}/${file.path}: HTTP ${response.status}`);

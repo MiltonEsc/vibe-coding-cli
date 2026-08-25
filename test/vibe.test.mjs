@@ -53,6 +53,31 @@ test("full-stack scaffold creates hierarchical AGENTS.md, design.md, and audited
   assert.ok(doctor.warnings >= 1);
 });
 
+test("stack selection is optional and custom stacks use general Skills", async (t) => {
+  const base = await tempRoot();
+  t.after(() => rm(base, { recursive: true, force: true }));
+
+  const genericTarget = path.join(base, "generic");
+  const generic = await initializeProject(genericTarget, { packageManager: "bun" });
+  assert.deepEqual(generic.stacks, []);
+  assert.ok(generic.skills.includes("software-architect"));
+  await assert.rejects(readFile(path.join(genericTarget, "apps", "web", "AGENTS.md"), "utf8"), /ENOENT/);
+  assert.equal((await runDoctor(genericTarget)).errors, 0);
+
+  const customTarget = path.join(base, "custom");
+  const custom = await initializeProject(customTarget, {
+    stacks: ["React", "Vite", "Hono", "PostgreSQL", "Redis", "WebSockets", "vite"],
+    packageManager: "bun",
+  });
+  assert.deepEqual(custom.stacks, ["react", "vite", "hono", "postgresql", "redis", "websockets"]);
+  assert.ok(custom.skills.includes("react-component-builder"));
+  assert.ok(!custom.skills.includes(undefined));
+  const doctor = await runDoctor(customTarget);
+  assert.equal(doctor.errors, 0);
+  assert.equal(doctor.passed, true);
+  assert.ok(doctor.issues.some((issue) => issue.severity === "info" && /vite, hono, postgresql, redis, websockets/.test(issue.message)));
+});
+
 test("workflow blocks placeholders and out-of-order approval, then invalidates downstream approvals", async (t) => {
   const base = await tempRoot();
   t.after(() => rm(base, { recursive: true, force: true }));
@@ -146,12 +171,32 @@ test("remote catalog install fails closed on checksum mismatch and leaves no par
   );
 });
 
-test("CLI dry-run reports a plan without creating the target", async (t) => {
+test("CLI defaults to no stack and can preserve a prompt file", async (t) => {
   const base = await tempRoot();
   t.after(() => rm(base, { recursive: true, force: true }));
   const target = path.join(base, "planned");
-  const { stdout } = await execFileAsync(process.execPath, [path.join(repoRoot, "dist", "cli.js"), "init", target, "--preset", "docs", "--dry-run"]);
+  const { stdout } = await execFileAsync(process.execPath, [path.join(repoRoot, "dist", "cli.js"), "init", target, "--dry-run"]);
   assert.match(stdout, /Planned Vibe project/);
-  assert.match(stdout, /documentation-only/);
+  assert.match(stdout, /Stacks: not selected/);
   await assert.rejects(readFile(path.join(target, "AGENTS.md"), "utf8"), /ENOENT/);
+
+  const promptFile = path.join(base, "brief.md");
+  await writeFile(promptFile, "# World Button\n\nBuild a realtime global button with Hono and WebSockets.\n");
+  const created = path.join(base, "world-button");
+  const result = await execFileAsync(process.execPath, [
+    path.join(repoRoot, "dist", "cli.js"),
+    "init",
+    created,
+    "--stack",
+    "React,Vite,Hono,PostgreSQL",
+    "--package-manager",
+    "bun",
+    "--prompt-file",
+    promptFile,
+  ]);
+  assert.match(result.stdout, /Stacks: react, vite, hono, postgresql/);
+  const requirements = await readFile(path.join(created, "requirements.md"), "utf8");
+  assert.match(requirements, /## Source brief/);
+  assert.match(requirements, /> # World Button/);
+  assert.match(requirements, /> Build a realtime global button with Hono and WebSockets\./);
 });

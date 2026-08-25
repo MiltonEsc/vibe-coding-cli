@@ -21,7 +21,12 @@ export const STACKS = [
   "github-actions",
 ] as const;
 
-export type Stack = (typeof STACKS)[number];
+export type KnownStack = (typeof STACKS)[number];
+export type Stack = string;
+
+export function isKnownStack(value: string): value is KnownStack {
+  return (STACKS as readonly string[]).includes(value);
+}
 export type PackageManager = "pnpm" | "npm" | "yarn" | "bun";
 
 export interface VibeConfig {
