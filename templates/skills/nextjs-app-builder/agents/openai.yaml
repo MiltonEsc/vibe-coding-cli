@@ -1,0 +1,4 @@
+interface:
+  display_name: "Next.js App Builder"
+  short_description: "Implement a Next.js frontend with deliberate rendering, data, caching, and security boundaries."
+  default_prompt: "Apply the nextjs-app-builder workflow to the current approved project stage."

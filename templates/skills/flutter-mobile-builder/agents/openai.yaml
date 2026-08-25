@@ -1,0 +1,4 @@
+interface:
+  display_name: "Flutter Mobile Builder"
+  short_description: "Implement predictable Flutter features with clear state, platform, accessibility, and lifecycle behavior."
+  default_prompt: "Apply the flutter-mobile-builder workflow to the current approved project stage."

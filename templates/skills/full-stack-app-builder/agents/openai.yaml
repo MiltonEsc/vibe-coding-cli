@@ -1,0 +1,4 @@
+interface:
+  display_name: "Full-Stack App Builder"
+  short_description: "Orchestrate a gated software delivery workflow from requirements through deployment."
+  default_prompt: "Coordinate the current project through the next approved delivery stage."

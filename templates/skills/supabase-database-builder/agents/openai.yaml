@@ -1,0 +1,4 @@
+interface:
+  display_name: "Supabase Database Builder"
+  short_description: "Create a migration-first Supabase data layer that denies access by default and is testable locally."
+  default_prompt: "Apply the supabase-database-builder workflow to the current approved project stage."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "NestJS Backend Builder"
+  short_description: "Implement a modular NestJS service with explicit dependency, validation, and authorization boundaries."
+  default_prompt: "Apply the nestjs-backend-builder workflow to the current approved project stage."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Software Architect"
+  short_description: "Create the smallest architecture that satisfies approved requirements and makes tradeoffs explicit."
+  default_prompt: "Apply the software-architect workflow to the current approved project stage."

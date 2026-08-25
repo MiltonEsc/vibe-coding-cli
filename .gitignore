@@ -1,0 +1,7 @@
+node_modules/
+dist/
+coverage/
+*.tgz
+*.zip
+*.exe
+.DS_Store

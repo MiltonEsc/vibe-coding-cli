@@ -1,0 +1,4 @@
+interface:
+  display_name: "FastAPI API Builder"
+  short_description: "Implement explicit API contracts with safe validation, authorization, and observable failure behavior."
+  default_prompt: "Apply the fastapi-api-builder workflow to the current approved project stage."

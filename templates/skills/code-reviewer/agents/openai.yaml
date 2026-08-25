@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code Reviewer"
+  short_description: "Find release-blocking defects and produce an evidence-based review rather than a style-only opinion."
+  default_prompt: "Apply the code-reviewer workflow to the current approved project stage."

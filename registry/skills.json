@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "policy": {
+    "allowedHosts": [
+      "raw.githubusercontent.com"
+    ],
+    "maxSkillBytes": 1048576,
+    "executableFilesAllowed": false
+  },
+  "entries": [
+    {
+      "id": "openai/frontend-testing-debugging",
+      "name": "frontend-testing-debugging",
+      "displayName": "Frontend Testing Debugging",
+      "description": "Browser-first frontend debugging and rendered UI validation workflow from OpenAI Plugins.",
+      "publisher": "OpenAI",
+      "repository": "https://github.com/openai/plugins",
+      "revisionPolicy": "The URL tracks upstream main, but this Vibe release pins every downloaded file by SHA-256 and rejects changed bytes.",
+      "reviewedAt": "2026-08-06",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "url": "https://raw.githubusercontent.com/openai/plugins/main/plugins/build-web-apps/skills/frontend-testing-debugging/SKILL.md",
+          "sha256": "03724620cf7e7de425b607a5492f572d867b1cf5d9c92c74bf50d057d7415e0b",
+          "maxBytes": 65536
+        },
+        {
+          "path": "agents/openai.yaml",
+          "url": "https://raw.githubusercontent.com/openai/plugins/main/plugins/build-web-apps/skills/frontend-testing-debugging/agents/openai.yaml",
+          "sha256": "82477c78c6f601cb85fa21d30f61624f49fd28ab75351e65093ee6afb04f864c",
+          "maxBytes": 4096
+        }
+      ]
+    },
+    {
+      "id": "github/create-agentsmd",
+      "name": "create-agentsmd",
+      "displayName": "Create AGENTS.md",
+      "description": "Repository analysis workflow for producing actionable AGENTS.md guidance from GitHub Awesome Copilot.",
+      "publisher": "GitHub",
+      "repository": "https://github.com/github/awesome-copilot",
+      "revisionPolicy": "The URL tracks upstream main, but this Vibe release pins every downloaded file by SHA-256 and rejects changed bytes.",
+      "reviewedAt": "2026-08-06",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "url": "https://raw.githubusercontent.com/github/awesome-copilot/main/skills/create-agentsmd/SKILL.md",
+          "sha256": "97b71d3f7c5e30e9f1740fcd7a45d4bf107b7887947cfd3ab92ac99dee294855",
+          "maxBytes": 65536
+        }
+      ]
+    }
+  ]
+}

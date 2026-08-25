@@ -1,0 +1,4 @@
+interface:
+  display_name: "Frontend Builder"
+  short_description: "Translate approved product and design decisions into resilient, accessible interfaces."
+  default_prompt: "Apply the frontend-builder workflow to the current approved project stage."

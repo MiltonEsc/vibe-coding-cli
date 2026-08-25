@@ -1,0 +1,44 @@
+{
+  "name": "@vibe-coding/cli",
+  "version": "0.1.0",
+  "description": "Secure project scaffolding for agent-assisted software development.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MiltonEsc/vibe-coding-cli.git"
+  },
+  "homepage": "https://github.com/MiltonEsc/vibe-coding-cli#readme",
+  "bugs": {
+    "url": "https://github.com/MiltonEsc/vibe-coding-cli/issues"
+  },
+  "type": "module",
+  "bin": {
+    "vibe": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "templates",
+    "registry",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepare": "npm run build",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "check": "npm test"
+  },
+  "keywords": [
+    "vibe-coding",
+    "agents-md",
+    "agent-skills",
+    "scaffolding",
+    "cli"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Test Engineer"
+  short_description: "Demonstrate that the integrated system meets acceptance criteria and fails safely."
+  default_prompt: "Apply the test-engineer workflow to the current approved project stage."

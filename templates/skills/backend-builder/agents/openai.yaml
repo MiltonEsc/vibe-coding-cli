@@ -1,0 +1,4 @@
+interface:
+  display_name: "Backend Builder"
+  short_description: "Build a testable backend that preserves domain invariants and exposes stable contracts."
+  default_prompt: "Apply the backend-builder workflow to the current approved project stage."

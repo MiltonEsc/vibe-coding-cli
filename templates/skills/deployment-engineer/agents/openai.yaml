@@ -1,0 +1,4 @@
+interface:
+  display_name: "Deployment Engineer"
+  short_description: "Make deployment repeatable and reversible without exposing secrets or bypassing approvals."
+  default_prompt: "Apply the deployment-engineer workflow to the current approved project stage."

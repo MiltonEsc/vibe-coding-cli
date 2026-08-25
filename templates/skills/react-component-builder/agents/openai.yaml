@@ -1,0 +1,4 @@
+interface:
+  display_name: "React Component Builder"
+  short_description: "Create focused components with predictable APIs and complete interaction states."
+  default_prompt: "Apply the react-component-builder workflow to the current approved project stage."

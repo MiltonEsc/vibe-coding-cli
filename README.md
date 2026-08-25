@@ -1,0 +1,291 @@
+# Vibe CLI
+
+Vibe is a zero-runtime-dependency Node.js CLI that creates a safe, traceable project structure for agent-assisted software development.
+
+It generates:
+
+- Hierarchical `AGENTS.md` files for the repository and selected subprojects.
+- A complete `design.md` experience contract.
+- Stage artifacts for requirements, architecture, database, backend, frontend, testing, review, and deployment.
+- A machine-readable workflow ledger with explicit, ordered approval gates.
+- A first-party Skill library with an orchestrator and stack-specific builders.
+- An opt-in remote Skill catalog with host allowlisting, size limits, SHA-256 verification, static audit, provenance, and atomic installation.
+
+Vibe does not install frameworks or execute remote scripts during `init`. It creates the contracts and directories first so architecture, dependencies, and network access can be reviewed before code generators run.
+
+## Requirements
+
+- Node.js 22 or newer to run the packaged CLI.
+- TypeScript 5.8 or newer only when rebuilding from source.
+
+The published tarball contains compiled JavaScript and has no runtime npm dependencies.
+
+## Quick start
+
+Install from the private GitHub repository (authenticate with GitHub first):
+
+```bash
+gh auth login
+gh auth setup-git
+npm install -g git+https://github.com/MiltonEsc/vibe-coding-cli.git
+vibe --version
+```
+
+From this repository:
+
+```bash
+npm run build
+node dist/cli.js init my-product --preset full-stack
+node dist/cli.js doctor my-product
+node dist/cli.js workflow status my-product
+```
+
+From the packaged tarball:
+
+```bash
+npm install -g ./vibe-cli-0.1.0.tgz
+vibe init my-product --preset full-stack
+cd my-product
+vibe doctor
+```
+
+The default `full-stack` preset selects Next.js, FastAPI, Supabase, and GitHub Actions. It also installs the React component Skill because Next.js uses React.
+
+## Presets and stacks
+
+```bash
+vibe init my-product --preset full-stack
+vibe init web-product --preset web
+vibe init api-product --preset api
+vibe init mobile-product --preset mobile
+vibe init planning-only --preset docs
+vibe init custom-product --stack nextjs,nestjs,supabase,github-actions
+```
+
+Supported stack selectors:
+
+- `nextjs`
+- `react`
+- `fastapi`
+- `nestjs`
+- `supabase`
+- `flutter`
+- `github-actions`
+
+Vibe rejects incompatible primary choices such as FastAPI and NestJS together, or Next.js and standalone React together.
+
+## Generated structure
+
+A default project contains this shape:
+
+```text
+my-product/
+├── AGENTS.md
+├── requirements.md
+├── architecture.md
+├── database.md
+├── backend.md
+├── design.md
+├── frontend.md
+├── testing.md
+├── review.md
+├── deployment.md
+├── SECURITY.md
+├── CONTRIBUTING.md
+├── .env.example
+├── .vibe/
+│   ├── config.json
+│   ├── workflow.json
+│   ├── workflow-history.jsonl        # created when a stage is reopened
+│   ├── skills.lock.json
+│   └── provenance/
+├── .agents/
+│   └── skills/
+│       ├── full-stack-app-builder/
+│       ├── requirements-analyst/
+│       ├── software-architect/
+│       ├── database-designer/
+│       ├── backend-builder/
+│       ├── frontend-builder/
+│       ├── test-engineer/
+│       ├── code-reviewer/
+│       ├── deployment-engineer/
+│       └── selected stack Skills...
+├── apps/
+│   ├── web/AGENTS.md
+│   └── api/AGENTS.md
+├── packages/shared/
+├── supabase/
+│   ├── AGENTS.md
+│   ├── migrations/
+│   └── tests/
+├── tests/AGENTS.md
+└── .github/
+    ├── AGENTS.md
+    └── workflows/
+```
+
+The closest `AGENTS.md` applies to its directory subtree and refines the root instructions. The files remain standard Markdown and do not depend on a proprietary parser.
+
+## Mandatory workflow
+
+The orchestrator always follows:
+
+```text
+requirements -> architecture -> database -> backend -> frontend -> testing -> review -> deployment
+```
+
+Every stage starts as `pending`. Approval requires all prior stages to be approved and the stage artifacts to be present, meaningful, and free of scaffold markers.
+
+```bash
+vibe workflow status
+vibe workflow approve requirements --approver "alice@example.com" --note "Product review 42"
+vibe workflow approve architecture --approver "architecture-review-ci"
+```
+
+Approval records the approver, timestamp, file sizes, and SHA-256 hashes of required artifacts. An agent Skill is explicitly instructed not to approve itself.
+
+When an earlier decision changes, reopen that stage. Vibe invalidates all downstream approvals and appends an event to the workflow history.
+
+```bash
+vibe workflow reopen architecture --reason "Authentication boundary changed"
+```
+
+A stage that is not applicable still needs a completed artifact explaining why and explicit approval. It is never skipped silently.
+
+## `design.md`
+
+The generated design contract covers:
+
+- Product experience goals, users, and jobs to be done.
+- Primary journeys and information architecture.
+- Interaction and visual-system principles.
+- Component inventory and all meaningful UI states.
+- Forms, validation, responsiveness, accessibility, and content design.
+- Data and API dependencies.
+- Performance budgets, analytics, privacy constraints, decisions, and acceptance criteria.
+
+The frontend stage requires both `design.md` and `frontend.md` before approval.
+
+## First-party Skills
+
+Vibe ships 16 auditable, instruction-only Skills:
+
+### Orchestration
+
+- `full-stack-app-builder`
+
+### Delivery stages
+
+- `requirements-analyst`
+- `software-architect`
+- `database-designer`
+- `backend-builder`
+- `frontend-builder`
+- `test-engineer`
+- `code-reviewer`
+- `deployment-engineer`
+
+### Stack-specific builders
+
+- `nextjs-app-builder`
+- `react-component-builder`
+- `fastapi-api-builder`
+- `nestjs-backend-builder`
+- `supabase-database-builder`
+- `flutter-mobile-builder`
+- `github-actions-deployer`
+
+Each first-party `SKILL.md` defines expected input, required result, project conventions, commands that may be proposed, safety boundaries, workflow, validation criteria, and handoff. Each Skill also includes `agents/openai.yaml` metadata.
+
+Only Skills relevant to the selected project stack are copied during `init`. Add another bundled Skill later with:
+
+```bash
+vibe skills bundled
+vibe skills add flutter-mobile-builder
+```
+
+## Remote Skills: secure by default
+
+Remote installation is optional and never runs during project creation.
+
+```bash
+vibe skills catalog
+vibe skills install openai/frontend-testing-debugging
+vibe skills install github/create-agentsmd
+```
+
+The initial catalog uses current source files from:
+
+- OpenAI Plugins: `frontend-testing-debugging`
+- GitHub Awesome Copilot: `create-agentsmd`
+
+The catalog intentionally does not use the archived `openai/skills` repository as an active source.
+
+Before installation, Vibe enforces all of these controls:
+
+1. The entry must exist in the local reviewed catalog.
+2. Every URL must use HTTPS and an allowlisted host.
+3. Redirect destinations are checked again.
+4. Paths are normalized and cannot escape the staging directory.
+5. Per-file and total size limits are enforced.
+6. Every byte must match its pinned SHA-256 checksum.
+7. Symlinks, executables, binary-prone file types, and binary content are rejected.
+8. Text is scanned for high-risk shell, credential-access, destructive, and prompt-injection patterns.
+9. `SKILL.md` frontmatter and naming are validated.
+10. The Skill is moved into place only after all checks pass.
+11. Source, review date, install date, and file hashes are recorded in `.vibe/skills.lock.json` and `.vibe/provenance/`.
+
+The upstream URLs may track a branch, but exact content is pinned in each Vibe release. If upstream bytes change, installation fails closed until the catalog is reviewed and updated.
+
+Static checks reduce risk but do not prove that third-party instructions are harmless. Review the diff and upstream license before using a remote Skill in a sensitive repository.
+
+## Auditing and diagnostics
+
+```bash
+vibe doctor
+vibe doctor --json
+vibe skills list
+vibe skills audit
+vibe skills audit --json
+```
+
+`doctor` verifies required project files, stage order, state consistency, scoped `AGENTS.md` files, required stack Skills, and Skill audit results. Unresolved scaffold markers are warnings; missing files, malformed workflow state, unsafe Skills, or broken stage ordering are errors.
+
+## CLI reference
+
+```text
+vibe init [directory] [--preset name] [--stack a,b] [--package-manager name]
+                         [--force] [--dry-run]
+vibe doctor [directory] [--json]
+vibe workflow status [directory] [--json]
+vibe workflow approve <stage> [directory] --approver <identity> [--note text]
+vibe workflow reopen <stage> [directory] --reason <text>
+vibe skills list [directory]
+vibe skills bundled
+vibe skills add <name> [directory] [--force]
+vibe skills audit [directory] [--json]
+vibe skills catalog [--json]
+vibe skills install <catalog-id> [directory] [--force]
+```
+
+## Development
+
+```bash
+npm run build
+npm test
+npm run check
+```
+
+Tests use Node's built-in test runner. There are no runtime dependencies and no install-time lifecycle scripts.
+
+## Standards and source references
+
+- AGENTS.md open format: https://agents.md/
+- Agent Skills specification: https://agentskills.io/specification
+- OpenAI Plugins: https://github.com/openai/plugins
+- GitHub Awesome Copilot: https://github.com/github/awesome-copilot
+
+## License
+
+MIT for Vibe CLI itself. Remote catalog entries retain their upstream terms; inspect each source repository before redistribution.

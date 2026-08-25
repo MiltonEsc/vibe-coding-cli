@@ -1,0 +1,4 @@
+interface:
+  display_name: "Requirements Analyst"
+  short_description: "Convert a project brief into an implementation-ready contract without inventing product decisions."
+  default_prompt: "Apply the requirements-analyst workflow to the current approved project stage."

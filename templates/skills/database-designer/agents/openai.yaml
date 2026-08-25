@@ -1,0 +1,4 @@
+interface:
+  display_name: "Database Designer"
+  short_description: "Produce a secure, evolvable data contract before backend features depend on it."
+  default_prompt: "Apply the database-designer workflow to the current approved project stage."

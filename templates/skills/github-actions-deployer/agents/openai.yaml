@@ -1,0 +1,4 @@
+interface:
+  display_name: "GitHub Actions Deployer"
+  short_description: "Make CI/CD reproducible and constrained, with production protected by explicit authorization."
+  default_prompt: "Apply the github-actions-deployer workflow to the current approved project stage."
