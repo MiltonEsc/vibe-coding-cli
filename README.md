@@ -1,5 +1,11 @@
 # Vibe CLI
 
+[![npm version](https://img.shields.io/npm/v/%40vibe-coding-cli%2Fcli)](https://www.npmjs.com/package/@vibe-coding-cli/cli)
+[![npm downloads](https://img.shields.io/npm/dm/%40vibe-coding-cli%2Fcli)](https://www.npmjs.com/package/@vibe-coding-cli/cli)
+[![CI](https://github.com/MiltonEsc/vibe-coding-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/MiltonEsc/vibe-coding-cli/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Node.js](https://img.shields.io/badge/Node.js-%3E%3D22-brightgreen.svg)](https://nodejs.org/)
+
 Vibe is a zero-runtime-dependency Node.js CLI that creates a safe, traceable project structure for agent-assisted software development.
 
 It generates:
@@ -288,6 +294,12 @@ Tests use Node's built-in test runner. There are no runtime dependencies and no 
 - Agent Skills specification: https://agentskills.io/specification
 - OpenAI Plugins: https://github.com/openai/plugins
 - GitHub Awesome Copilot: https://github.com/github/awesome-copilot
+
+## Contributing
+
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup, testing expectations, security-sensitive areas, and pull request guidance.
+
+Release history is tracked in [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 
