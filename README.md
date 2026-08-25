@@ -22,13 +22,22 @@ The published tarball contains compiled JavaScript and has no runtime npm depend
 
 ## Quick start
 
-Install from the private GitHub repository (authenticate with GitHub first):
+Run without installing globally:
 
 ```bash
-gh auth login
-gh auth setup-git
-npm install -g git+https://github.com/MiltonEsc/vibe-coding-cli.git
+npx @vibe-coding-cli/cli init my-product --preset full-stack
+cd my-product
+npx @vibe-coding-cli/cli doctor
+```
+
+Or install the CLI globally:
+
+```bash
+npm install -g @vibe-coding-cli/cli
 vibe --version
+vibe init my-product --preset full-stack
+cd my-product
+vibe doctor
 ```
 
 From this repository:
@@ -38,15 +47,6 @@ npm run build
 node dist/cli.js init my-product --preset full-stack
 node dist/cli.js doctor my-product
 node dist/cli.js workflow status my-product
-```
-
-From the packaged tarball:
-
-```bash
-npm install -g ./vibe-cli-0.2.0.tgz
-vibe init my-product --preset full-stack
-cd my-product
-vibe doctor
 ```
 
 With no `--preset` or `--stack`, Vibe creates the core contracts, workflow, and general Skills while deferring technology choices to the architecture stage. The explicit `full-stack` preset selects Next.js, FastAPI, Supabase, and GitHub Actions. It also installs the React component Skill because Next.js uses React.
