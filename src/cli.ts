@@ -4,10 +4,10 @@ import { DEFAULT_STACKS } from "./constants.js";
 import { runDoctor } from "./doctor.js";
 import { initializeProject, validateStacks } from "./scaffold.js";
 import { addBundledSkill, auditInstalledSkills, installRemoteSkill, listBundledSkills, listInstalledSkills, loadCatalog } from "./skills.js";
-import { approveStage, isStage, loadWorkflow, reopenStage, workflowRows } from "./workflow.js";
+import { approveStage, isStage, loadWorkflow, readWorkflowHistory, reopenStage, verifyWorkflow, workflowRows } from "./workflow.js";
 import { STACKS, type PackageManager, type Stack } from "./types.js";
 
-const VERSION = "0.2.0";
+const VERSION = "0.3.0";
 const PRESETS: Record<string, Stack[]> = {
   "full-stack": [...DEFAULT_STACKS],
   web: ["nextjs", "supabase", "github-actions"],
@@ -87,7 +87,7 @@ function printRows(rows: Array<Record<string, string>>): void {
 }
 
 function printRootHelp(): void {
-  console.log(`vibe ${VERSION}\n\nSecure scaffolding and gated workflows for agent-assisted software projects.\n\nUsage:\n  vibe init [directory] [options]\n  vibe doctor [directory] [--json]\n  vibe workflow status [directory] [--json]\n  vibe workflow approve <stage> [directory] --approver <identity> [--note <text>]\n  vibe workflow reopen <stage> [directory] --reason <text>\n  vibe skills list [directory]\n  vibe skills bundled\n  vibe skills add <name> [directory] [--force]\n  vibe skills audit [directory] [--json]\n  vibe skills catalog [--json]\n  vibe skills install <catalog-id> [directory] [--force]\n\nInit presets: ${Object.keys(PRESETS).join(", ")}\nKnown stacks: ${STACKS.join(", ")}\nCustom stack identifiers are also accepted.\n`);
+  console.log(`vibe ${VERSION}\n\nSecure scaffolding and gated workflows for agent-assisted software projects.\n\nUsage:\n  vibe init [directory] [options]\n  vibe doctor [directory] [--json]\n  vibe workflow status [directory] [--json]\n  vibe workflow verify [directory] [--json]\n  vibe workflow history [stage] [directory] [--json]\n  vibe workflow approve <stage> [directory] --approver <identity> [--note <text>]\n  vibe workflow reopen <stage> [directory] --reason <text> [--actor <identity>]\n  vibe skills list [directory]\n  vibe skills bundled\n  vibe skills add <name> [directory] [--force]\n  vibe skills audit [directory] [--json]\n  vibe skills catalog [--json]\n  vibe skills install <catalog-id> [directory] [--force]\n\nInit presets: ${Object.keys(PRESETS).join(", ")}\nKnown stacks: ${STACKS.join(", ")}\nCustom stack identifiers are also accepted.\n`);
 }
 
 function requirePositional(values: string[], index: number, label: string): string {
@@ -146,17 +146,68 @@ async function runDoctorCommand(tokens: string[]): Promise<void> {
 async function runWorkflow(tokens: string[]): Promise<void> {
   const subcommand = tokens.shift();
   if (!subcommand || subcommand === "help" || subcommand === "--help" || subcommand === "-h") {
-    console.log("Usage: vibe workflow status|approve|reopen ...");
+    console.log("Usage: vibe workflow status|verify|history|approve|reopen ...");
     return;
   }
   if (subcommand === "status") {
     const parsed = parseArgs(tokens, {}, { "--json": "json" });
     if (parsed.positional.length > 1) throw new Error("workflow status accepts at most one directory.");
     const { root, state } = await loadWorkflow(parsed.positional[0] ?? ".");
-    if (parsed.flags.has("json")) console.log(JSON.stringify({ root, ...state }, null, 2));
+    const verification = await verifyWorkflow(root);
+    if (parsed.flags.has("json")) console.log(JSON.stringify({ root, ...state, integrity: verification }, null, 2));
     else {
       console.log(`Project: ${root}`);
-      printRows(workflowRows(state));
+      printRows(workflowRows(state, verification));
+    }
+    return;
+  }
+  if (subcommand === "verify") {
+    const parsed = parseArgs(tokens, {}, { "--json": "json", "--help": "help", "-h": "help" });
+    if (parsed.flags.has("help")) {
+      console.log("Usage: vibe workflow verify [directory] [--json]");
+      return;
+    }
+    if (parsed.positional.length > 1) throw new Error("workflow verify accepts at most one directory.");
+    const report = await verifyWorkflow(parsed.positional[0] ?? ".");
+    if (parsed.flags.has("json")) console.log(JSON.stringify(report, null, 2));
+    else {
+      console.log("Vibe Workflow Integrity");
+      console.log(`Project: ${report.root}`);
+      printRows(report.stages.map((item) => ({ stage: item.stage, status: item.status, integrity: item.integrity ?? "-" })));
+      for (const issue of report.issues) {
+        console.log(`ERROR ${issue.path}: ${issue.message}`);
+        if (issue.approvedSha256) console.log(`  Approved SHA-256: ${issue.approvedSha256}`);
+        if (issue.currentSha256) console.log(`  Current SHA-256:  ${issue.currentSha256}`);
+        if (issue.recommendedCommand) console.log(`  Recommended action: ${issue.recommendedCommand}`);
+      }
+      console.log(`Workflow integrity: ${report.passed ? "verified" : "failed"}.`);
+    }
+    if (!report.passed) process.exitCode = 1;
+    return;
+  }
+  if (subcommand === "history") {
+    const parsed = parseArgs(tokens, {}, { "--json": "json", "--help": "help", "-h": "help" });
+    if (parsed.flags.has("help")) {
+      console.log("Usage: vibe workflow history [stage] [directory] [--json]");
+      return;
+    }
+    if (parsed.positional.length > 2) throw new Error("workflow history accepts an optional stage and directory.");
+    const first = parsed.positional[0];
+    const stage = first && isStage(first) ? first : undefined;
+    const directory = stage ? parsed.positional[1] ?? "." : first ?? ".";
+    const history = await readWorkflowHistory(directory);
+    const events = stage ? history.events.filter((event) => event.stage === stage) : history.events;
+    if (parsed.flags.has("json")) console.log(JSON.stringify({ schemaVersion: 1, root: history.root, stage, events }, null, 2));
+    else {
+      console.log(`Project: ${history.root}`);
+      printRows(events.map((event) => ({
+        type: String(event.type ?? "-"),
+        stage: String(event.stage ?? "-"),
+        actor: String(event.actor ?? "-"),
+        at: String(event.at ?? "-"),
+        commit: String(event.commit ?? "-"),
+        reason: String(event.reason ?? "-"),
+      })));
     }
     return;
   }
@@ -169,15 +220,16 @@ async function runWorkflow(tokens: string[]): Promise<void> {
     const state = await approveStage(stageValue, { start: parsed.positional[1] ?? ".", approver: parsed.values.approver, note: parsed.values.note });
     const approved = state.stages[stageValue];
     console.log(`Approved ${stageValue} by ${approved.approvedBy} at ${approved.approvedAt}.`);
+    if (approved.workingTreeClean === false) console.log("WARNING Approval was recorded with uncommitted Git changes. Commit or review the exact approved evidence before merge.");
     return;
   }
   if (subcommand === "reopen") {
-    const parsed = parseArgs(tokens, { "--reason": "reason" }, {});
+    const parsed = parseArgs(tokens, { "--reason": "reason", "--actor": "actor" }, {});
     const stageValue = requirePositional(parsed.positional, 0, "stage");
     if (!isStage(stageValue)) throw new Error(`Unknown stage: ${stageValue}`);
     if (!parsed.values.reason) throw new Error("Option --reason is required.");
     if (parsed.positional.length > 2) throw new Error("workflow reopen accepts only stage and optional directory.");
-    const result = await reopenStage(stageValue, { start: parsed.positional[1] ?? ".", reason: parsed.values.reason });
+    const result = await reopenStage(stageValue, { start: parsed.positional[1] ?? ".", reason: parsed.values.reason, actor: parsed.values.actor });
     console.log(`Reopened ${stageValue}. Invalidated approvals: ${result.reopened.length > 0 ? result.reopened.join(", ") : "none"}.`);
     return;
   }

@@ -19,12 +19,14 @@ npm run check
 
 ## Development workflow
 
-Create a focused branch from `main`, make the smallest coherent change, update or add tests, and run the full check before opening a pull request.
+Create a focused branch from `main`, declare the task scope and approved contracts being consumed, make the smallest coherent change, update or add tests, and run the full check before opening a pull request.
 
 ```bash
 git checkout -b feat/my-change
 npm run check
 ```
+
+For a Vibe-governed project, run `vibe workflow verify` before implementation and again before opening the pull request. Never modify an approved upstream artifact as a side effect. If the task requires a contract change, stop and request explicit authorization to reopen that stage with an accountable actor and reason.
 
 For CLI behavior, you can run the compiled command directly:
 
@@ -64,6 +66,7 @@ Do not weaken these guarantees without explicit justification and tests:
 - Audit-before-install behavior.
 - Atomic installation.
 - Approval ordering and downstream invalidation.
+- Approval drift detection and optimistic approval checks.
 
 Never add automatic dependency installation or arbitrary remote execution to `vibe init`.
 

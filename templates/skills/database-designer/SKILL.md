@@ -25,6 +25,8 @@ Produce a secure, evolvable data contract before backend features depend on it.
 
 ## Project conventions
 
+- Declare task scope, allowed files, and the approved contracts being consumed before editing.
+- Run `vibe workflow verify`. Never change approved requirements or architecture as a schema side effect; request an explicit reopen when a contract must change.
 - Use migrations; never mutate production schemas manually.
 - Enforce critical invariants in the database when practical.
 - Deny access by default and document privileged paths.
@@ -35,6 +37,7 @@ Produce a secure, evolvable data contract before backend features depend on it.
 Run only commands that exist in the project and fit the approved stage. Use the repository package manager and scoped working directory.
 
 - `vibe workflow status`
+- `vibe workflow verify`
 - `supabase db lint`
 - `supabase db diff --local`
 - `supabase test db`

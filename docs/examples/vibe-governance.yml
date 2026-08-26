@@ -1,0 +1,36 @@
+name: Vibe governance
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: npm
+
+      - name: Install project dependencies
+        run: npm ci
+
+      - name: Verify Vibe project
+        run: |
+          npx --yes @vibe-coding-cli/cli@0.3.0 doctor
+          npx --yes @vibe-coding-cli/cli@0.3.0 workflow verify
+          npx --yes @vibe-coding-cli/cli@0.3.0 skills audit
+
+      - name: Run project tests
+        run: npm test
+
+      - name: Run project checks
+        run: npm run check

@@ -19,6 +19,8 @@ It generates:
 
 Vibe does not install frameworks or execute remote scripts during `init`. It creates the contracts and directories first so architecture, dependencies, and network access can be reviewed before code generators run.
 
+Documentation: [GitHub Wiki](https://github.com/MiltonEsc/vibe-coding-cli/wiki) | [Team workflow guide](docs/vibe-team-workflow.md) | [Changelog](CHANGELOG.md)
+
 ## Requirements
 
 - Node.js 22 or newer to run the packaged CLI.
@@ -105,7 +107,7 @@ my-product/
 ├── .vibe/
 │   ├── config.json
 │   ├── workflow.json
-│   ├── workflow-history.jsonl        # created when a stage is reopened
+│   ├── workflow-history.jsonl        # created on the first approval event
 │   ├── skills.lock.json
 │   └── provenance/
 ├── .agents/
@@ -148,19 +150,50 @@ Every stage starts as `pending`. Approval requires all prior stages to be approv
 
 ```bash
 vibe workflow status
+vibe workflow verify
 vibe workflow approve requirements --approver "alice@example.com" --note "Product review 42"
 vibe workflow approve architecture --approver "architecture-review-ci"
 ```
 
-Approval records the approver, timestamp, file sizes, and SHA-256 hashes of required artifacts. An agent Skill is explicitly instructed not to approve itself.
+Approval records the approver, timestamp, file sizes, SHA-256 hashes, and optional Git commit, branch, and working-tree context. Immediately before persistence, Vibe rechecks the artifacts and ledger to prevent a concurrent change from receiving stale approval. An agent Skill is explicitly instructed not to approve itself.
+
+`vibe workflow verify` derives integrity from the current files and recorded evidence. An approved artifact that changes remains `approved` but reports `drifted`; verification and `doctor` fail until a human explicitly reopens the contract.
 
 When an earlier decision changes, reopen that stage. Vibe invalidates all downstream approvals and appends an event to the workflow history.
 
 ```bash
-vibe workflow reopen architecture --reason "Authentication boundary changed"
+vibe workflow reopen architecture --reason "Authentication boundary changed" --actor "alice@example.com"
+vibe workflow history architecture
 ```
 
 A stage that is not applicable still needs a completed artifact explaining why and explicit approval. It is never skipped silently.
+
+## Team development with AI agents
+
+Vibe recommends **Contract-First + Branch-by-Task + PR-Gated + Explicit Reopen**:
+
+```text
+Developer A + Agent A     Developer B + Agent B
+           \                 /
+            approved contracts
+                    |
+             focused branches
+                    |
+              pull requests
+                    |
+       vibe workflow verify + CI
+                    |
+              human review
+                    |
+                  main
+```
+
+- **Contract-first:** `requirements.md`, `architecture.md`, `database.md`, and `design.md` become immutable upstream contracts once approved.
+- **Branch-by-task:** each developer and assistant works on a focused branch with declared scope and avoids unrelated architecture, schema, dependency, or framework changes.
+- **PR-gated:** protect `main`, require pull requests, status checks, resolved conversations, and at least one accountable review. CODEOWNER review and dismissal of stale approvals are recommended.
+- **Explicit reopen:** an agent that discovers a necessary contract change stops, explains the impact, and requests authorization. It never edits the ledger or runs reopen silently.
+
+Git coordinates collaboration and merge. Vibe verifies that the contracts used by every branch still match their human approvals. See [Vibe Team Workflow](docs/vibe-team-workflow.md) for branch protection, task scope, CI, and multi-agent examples.
 
 ## `design.md`
 
@@ -254,12 +287,15 @@ Static checks reduce risk but do not prove that third-party instructions are har
 ```bash
 vibe doctor
 vibe doctor --json
+vibe workflow verify
+vibe workflow verify --json
+vibe workflow history --json
 vibe skills list
 vibe skills audit
 vibe skills audit --json
 ```
 
-`doctor` verifies required project files, stage order, state consistency, scoped `AGENTS.md` files, required stack Skills, and Skill audit results. Unresolved scaffold markers are warnings; missing files, malformed workflow state, unsafe Skills, or broken stage ordering are errors.
+`doctor` verifies required project files, stage order, state consistency, approval hashes, scoped `AGENTS.md` files, required stack Skills, and Skill audit results. Unresolved scaffold markers are warnings; approval drift, missing files, malformed workflow state, unsafe Skills, or broken stage ordering are errors. JSON output includes structured drift codes, stages, approvers, approved/current hashes, and the recommended reopen command.
 
 ## CLI reference
 
@@ -268,8 +304,10 @@ vibe init [directory] [--preset name] [--stack a,b] [--package-manager name]
                          [--prompt text|--prompt-file path] [--force] [--dry-run]
 vibe doctor [directory] [--json]
 vibe workflow status [directory] [--json]
+vibe workflow verify [directory] [--json]
+vibe workflow history [stage] [directory] [--json]
 vibe workflow approve <stage> [directory] --approver <identity> [--note text]
-vibe workflow reopen <stage> [directory] --reason <text>
+vibe workflow reopen <stage> [directory] --reason <text> [--actor <identity>]
 vibe skills list [directory]
 vibe skills bundled
 vibe skills add <name> [directory] [--force]

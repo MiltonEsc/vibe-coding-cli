@@ -25,6 +25,8 @@ Make deployment repeatable and reversible without exposing secrets or bypassing 
 
 ## Project conventions
 
+- Declare task scope, allowed files, and the approved contracts being consumed before editing.
+- Run `vibe workflow verify`. Do not deploy artifacts based on drifted approvals or silently modify approved deployment contracts.
 - Use immutable artifacts and environment protections.
 - Reference secrets from a secret manager; never commit values.
 - Run database changes with an explicit recovery plan.
@@ -35,6 +37,7 @@ Make deployment repeatable and reversible without exposing secrets or bypassing 
 Run only commands that exist in the project and fit the approved stage. Use the repository package manager and scoped working directory.
 
 - `vibe workflow status`
+- `vibe workflow verify`
 - `actionlint`
 - `yamllint .github/workflows`
 - `docker build .`

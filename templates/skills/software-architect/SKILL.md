@@ -25,6 +25,8 @@ Create the smallest architecture that satisfies approved requirements and makes 
 
 ## Project conventions
 
+- Declare task scope, allowed files, and the approved contracts being consumed before editing.
+- Run `vibe workflow verify`. If architecture is already approved, request an explicit reopen before changing it; never reopen or edit the ledger automatically.
 - Prefer reversible decisions and explicit module boundaries.
 - Document alternatives and consequences, not only the chosen option.
 - Keep protocol and data ownership contracts explicit.
@@ -35,6 +37,7 @@ Create the smallest architecture that satisfies approved requirements and makes 
 Run only commands that exist in the project and fit the approved stage. Use the repository package manager and scoped working directory.
 
 - `vibe workflow status`
+- `vibe workflow verify`
 - `git diff -- architecture.md docs/adr`
 - `rg "TBD|TODO|OPEN" architecture.md docs/adr`
 
