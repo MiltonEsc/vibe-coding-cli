@@ -19,7 +19,7 @@ It generates:
 
 Vibe does not install frameworks or execute remote scripts during `init`. It creates the contracts and directories first so architecture, dependencies, and network access can be reviewed before code generators run.
 
-Documentation: [GitHub Wiki](https://github.com/MiltonEsc/vibe-coding-cli/wiki) | [Team workflow guide](docs/vibe-team-workflow.md) | [Changelog](CHANGELOG.md)
+Documentation: [Wiki](docs/wiki/Home.md) | [Team workflow guide](docs/vibe-team-workflow.md) | [Changelog](CHANGELOG.md)
 
 ## Requirements
 
