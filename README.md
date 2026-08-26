@@ -68,7 +68,7 @@ vibe init api-product --preset api
 vibe init mobile-product --preset mobile
 vibe init planning-only --preset docs
 vibe init custom-product --stack nextjs,nestjs,supabase,github-actions
-vibe init world-button --stack react,vite,hono,postgresql,redis,websockets --package-manager bun --prompt-file ./world-button.md
+vibe init my-product --stack react,vite,hono,postgresql,redis,websockets --package-manager bun --prompt-file ./my-product.md
 ```
 
 Known stack selectors with bundled specializations:
