@@ -3,13 +3,20 @@ import path from "node:path";
 import { STACK_SKILLS, STAGE_SKILLS } from "./constants.js";
 import { auditSkillDirectory } from "./security.js";
 import { exists, findProjectRoot, readJson } from "./paths.js";
-import { STAGES, isKnownStack, type Stack, type VibeConfig, type WorkflowState } from "./types.js";
+import { STAGES, isKnownStack, type Stack, type VibeConfig, type WorkflowVerificationReport } from "./types.js";
 import { validateStacks } from "./scaffold.js";
+import { verifyWorkflow } from "./workflow.js";
 
 export interface DoctorIssue {
   severity: "error" | "warning" | "info";
   path: string;
   message: string;
+  code?: string;
+  stage?: string;
+  approvedBy?: string;
+  approvedSha256?: string;
+  currentSha256?: string;
+  recommendedCommand?: string;
 }
 
 export interface DoctorReport {
@@ -18,6 +25,7 @@ export interface DoctorReport {
   errors: number;
   warnings: number;
   passed: boolean;
+  workflow?: WorkflowVerificationReport;
 }
 
 const ROOT_FILES = [
@@ -49,6 +57,7 @@ function expectedNestedAgents(stacks: Stack[]): string[] {
 export async function runDoctor(start?: string): Promise<DoctorReport> {
   const root = await findProjectRoot(start);
   const issues: DoctorIssue[] = [];
+  let workflow: WorkflowVerificationReport | undefined;
 
   for (const relativePath of ROOT_FILES) {
     if (!(await exists(path.join(root, relativePath)))) {
@@ -75,24 +84,26 @@ export async function runDoctor(start?: string): Promise<DoctorReport> {
   }
 
   try {
-    const workflow = await readJson<WorkflowState>(path.join(root, ".vibe", "workflow.json"));
-    if (JSON.stringify(workflow.order) !== JSON.stringify(STAGES)) {
-      issues.push({ severity: "error", path: ".vibe/workflow.json", message: "Workflow order is invalid." });
-    }
-    let seenPending = false;
-    for (const stage of STAGES) {
-      const value = workflow.stages[stage];
-      if (!value || (value.status !== "pending" && value.status !== "approved")) {
-        issues.push({ severity: "error", path: ".vibe/workflow.json", message: `Invalid state for stage ${stage}.` });
-        continue;
-      }
-      if (value.status === "pending") seenPending = true;
-      if (seenPending && value.status === "approved") {
-        issues.push({ severity: "error", path: ".vibe/workflow.json", message: `Stage ${stage} is approved after a pending prerequisite.` });
-      }
+    workflow = await verifyWorkflow(root);
+    for (const issue of workflow.issues) {
+      const hashDetails = issue.approvedSha256
+        ? ` Approved SHA-256: ${issue.approvedSha256}.${issue.currentSha256 ? ` Current SHA-256: ${issue.currentSha256}.` : ""}`
+        : "";
+      const action = issue.recommendedCommand ? ` Recommended action: ${issue.recommendedCommand}` : "";
+      issues.push({
+        severity: "error",
+        path: issue.path,
+        message: `${issue.message}${hashDetails}${action}`,
+        code: issue.code,
+        stage: issue.stage,
+        approvedBy: issue.approvedBy,
+        approvedSha256: issue.approvedSha256,
+        currentSha256: issue.currentSha256,
+        recommendedCommand: issue.recommendedCommand,
+      });
     }
   } catch (error) {
-    issues.push({ severity: "error", path: ".vibe/workflow.json", message: `Cannot parse workflow: ${(error as Error).message}` });
+    issues.push({ severity: "error", path: ".vibe/workflow.json", message: `Cannot verify workflow: ${(error as Error).message}` });
   }
 
   if (config) {
@@ -139,5 +150,5 @@ export async function runDoctor(start?: string): Promise<DoctorReport> {
 
   const errors = issues.filter((issue) => issue.severity === "error").length;
   const warnings = issues.filter((issue) => issue.severity === "warning").length;
-  return { root, issues, errors, warnings, passed: errors === 0 };
+  return { root, issues, errors, warnings, passed: errors === 0, workflow };
 }

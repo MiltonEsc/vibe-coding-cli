@@ -25,6 +25,8 @@ Convert a project brief into an implementation-ready contract without inventing 
 
 ## Project conventions
 
+- Declare task scope, allowed files, and the approved contracts being consumed before editing.
+- Run `vibe workflow verify`. If requirements are already approved, request an explicit reopen before changing them; never reopen or edit the ledger automatically.
 - Give every requirement a stable ID such as FR-001 or NFR-001.
 - Separate facts, assumptions, and open questions.
 - Make acceptance criteria observable and technology-neutral.
@@ -35,6 +37,7 @@ Convert a project brief into an implementation-ready contract without inventing 
 Run only commands that exist in the project and fit the approved stage. Use the repository package manager and scoped working directory.
 
 - `vibe workflow status`
+- `vibe workflow verify`
 - `git diff -- requirements.md`
 - `rg "TBD|TODO|OPEN" requirements.md`
 

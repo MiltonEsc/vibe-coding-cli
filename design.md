@@ -23,6 +23,7 @@ A developer or technical lead who wants an agent-ready project structure, reusab
 - Transparent: generated Markdown remains directly editable and understandable.
 - Portable: use AGENTS.md and SKILL.md conventions rather than a private prompt database.
 - Traceable: preserve ordered approvals and content hashes.
+- Team-safe: approved contracts remain verifiable across branches, developers, and assistants; detected drift never becomes an automatic human decision.
 - Composable: add only stack-relevant Skills while keeping an end-to-end orchestrator.
 - Progressive specialization: custom stacks remain valid metadata while known stacks add focused Skills and scoped files.
 - Fail closed: checksum, path, host, size, or audit failures stop remote installation.
@@ -31,7 +32,7 @@ A developer or technical lead who wants an agent-ready project structure, reusab
 
 - `init`: project creation.
 - `doctor`: repository diagnostics.
-- `workflow`: status, approval, and reopening.
+- `workflow`: status, integrity verification, approval, history, and explicit reopening.
 - `skills`: bundled discovery, local audit, catalog inspection, and secure installation.
 
 ## Important states
@@ -39,6 +40,7 @@ A developer or technical lead who wants an agent-ready project structure, reusab
 - Empty target versus non-empty target.
 - Dry-run versus write.
 - Pending, approved, and invalidated workflow stages.
+- Verified, drifted, and invalid approval integrity derived from current artifacts.
 - Clean Skill, warning-only Skill, and rejected Skill.
 - Downloaded, checksum-mismatched, audit-failed, and atomically installed remote content.
 

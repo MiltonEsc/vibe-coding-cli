@@ -30,6 +30,7 @@ function rootCommands(ctx: TemplateContext): string[] {
   const commands = [
     "vibe doctor",
     "vibe workflow status",
+    "vibe workflow verify",
     "vibe skills audit",
   ];
   if (has(ctx, "nextjs") || has(ctx, "react") || has(ctx, "nestjs")) {
@@ -72,7 +73,7 @@ Follow this exact order and do not skip a stage silently:
 7. review
 8. deployment
 
-Run \`vibe workflow status\` before starting a stage. Read the approved upstream artifacts. Produce the current stage artifact and validation evidence. Only an accountable human or CI gate may run \`vibe workflow approve <stage> --approver <identity>\`.
+Run \`vibe workflow status\` and \`vibe workflow verify\` before starting a stage. Read the approved upstream artifacts. Produce the current stage artifact and validation evidence. Only an accountable human or CI gate may run \`vibe workflow approve <stage> --approver <identity>\`.
 
 ## Source of truth
 
@@ -82,6 +83,20 @@ Run \`vibe workflow status\` before starting a stage. Read the approved upstream
 - Experience contract: \`design.md\`
 - Delivery ledger: \`.vibe/workflow.json\`
 - Reusable agent instructions: \`.agents/skills/\`
+
+## Approved contract policy
+
+Approved upstream artifacts are immutable contracts for downstream work. Never modify an approved contract as a side effect of implementation. If a contract change is required:
+
+1. Stop the affected implementation work.
+2. Name the contract, reason, and downstream stages affected.
+3. Request explicit human authorization to run \`vibe workflow reopen <stage> --reason "..." --actor <identity>\`.
+4. Do not run reopen or edit \`.vibe/workflow.json\` on the user's behalf without that authorization.
+5. Resume only after the revised contract is reviewed and approved.
+
+## Team task scope
+
+Before implementation, state the task objective, allowed files or areas, current branch, and approved contracts being consumed. Stay inside that scope. Use a focused branch and pull request; do not combine unrelated architecture, schema, dependency, or framework changes. Inspect \`.vibe/tasks/\` when present, but treat Git and human review as the collaboration authority.
 
 ## Setup and validation commands
 
@@ -718,11 +733,12 @@ function contributingDoc(ctx: TemplateContext): string {
   return `# Contributing
 
 1. Read AGENTS.md and the nearest nested AGENTS.md.
-2. Run \`vibe workflow status\` and work only in the current approved stage.
-3. Update the relevant artifact before changing consequential implementation decisions.
-4. Add tests and run the stack validation commands.
-5. Run \`vibe doctor\` and \`vibe skills audit\`.
-6. Open a review with requirement IDs, risks, exact commands, results, and rollback impact.
+2. State task scope, allowed areas, branch, owner, and approved contracts being consumed.
+3. Run \`vibe workflow status\` and \`vibe workflow verify\` and work only in the current approved stage.
+4. Never modify an approved upstream contract incidentally; request an explicit reopen when a contract must change.
+5. Add tests and run the stack validation commands.
+6. Run \`vibe doctor\`, \`vibe workflow verify\`, and \`vibe skills audit\`.
+7. Open a focused pull request with requirement IDs, risks, exact commands, results, and rollback impact.
 
 Package manager: ${ctx.packageManager}
 Stack status: ${stackSummary(ctx)}
@@ -738,7 +754,7 @@ This repository was scaffolded by Vibe CLI for a gated agent-assisted delivery w
 
 1. Read \`AGENTS.md\`.
 2. Complete \`requirements.md\` and remove all \`VIBE:REQUIRED\` markers.
-3. Run \`vibe doctor\`.
+3. Run \`vibe doctor\` and \`vibe workflow verify\`.
 4. Ask an accountable reviewer to approve the requirements stage:
 
 \`vibe workflow approve requirements --approver "name-or-ci-identity" --note "review reference"\`
@@ -766,6 +782,7 @@ function rootPackageJson(ctx: TemplateContext): string {
     scripts: {
       "vibe:doctor": "vibe doctor",
       "vibe:status": "vibe workflow status",
+      "vibe:verify": "vibe workflow verify",
       "vibe:audit": "vibe skills audit",
       lint: "echo Configure stack lint commands after architecture approval",
       test: "echo Configure stack test commands after implementation",

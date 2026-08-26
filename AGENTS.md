@@ -29,6 +29,9 @@ Vibe CLI is a zero-runtime-dependency Node.js 22 command-line tool written in Ty
 - Update tests for workflow gates, security controls, scaffold structure, and CLI parsing.
 - Keep Skill frontmatter to `name` and `description`; use lowercase kebab-case names.
 - Run the skill-creator validator before packaging a first-party Skill.
+- Treat approved stage artifacts as immutable contracts for downstream work. Run `vibe workflow verify` before implementation and never modify an approved upstream contract as a side effect.
+- State the task scope, allowed files or areas, and consumed contracts before implementation. Stop and request an explicit reopen when the requested work requires a contract change.
+- Use focused branches and pull requests for consequential changes; Vibe verifies contracts while Git coordinates collaboration and review.
 
 ## Security review requirements
 

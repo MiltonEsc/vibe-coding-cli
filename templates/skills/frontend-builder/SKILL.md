@@ -25,6 +25,8 @@ Translate approved product and design decisions into resilient, accessible inter
 
 ## Project conventions
 
+- Declare task scope, allowed files, and the approved contracts being consumed before editing.
+- Run `vibe workflow verify`. Never modify an approved upstream contract as an implementation side effect; stop and request an explicit reopen when necessary.
 - Use semantic elements and keyboard-operable interactions.
 - Keep server data, local UI state, and form state distinct.
 - Do not hide errors or rely on color alone.
@@ -35,6 +37,7 @@ Translate approved product and design decisions into resilient, accessible inter
 Run only commands that exist in the project and fit the approved stage. Use the repository package manager and scoped working directory.
 
 - `vibe workflow status`
+- `vibe workflow verify`
 - `pnpm lint`
 - `pnpm test`
 - `pnpm build`

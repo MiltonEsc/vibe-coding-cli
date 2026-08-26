@@ -1,0 +1,15 @@
+## Vibe CLI
+
+- [Inicio](Home)
+- [Instalacion](Installation)
+- [Primer proyecto](Getting-Started)
+- [Prompts y stacks](Prompts-and-Stacks)
+- [Estructura generada](Generated-Structure)
+- [Workflow y aprobaciones](Workflow-and-Approvals)
+- [Integridad y drift](Integrity-and-Drift)
+- [Trabajo en equipo](Team-Development)
+- [Referencia del CLI](CLI-Reference)
+- [CI y GitHub](CI-and-GitHub)
+- [Skills y seguridad](Skills-and-Security)
+- [Solucion de problemas](Troubleshooting)
+- [Novedades de v0.3.0](Release-0.3.0)

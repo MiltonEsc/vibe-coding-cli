@@ -59,12 +59,62 @@ export interface WorkflowStageState {
   approvedBy?: string;
   note?: string;
   evidence?: ArtifactEvidence[];
+  approvedCommit?: string;
+  approvedBranch?: string;
+  workingTreeClean?: boolean;
 }
 
 export interface WorkflowState {
   schemaVersion: 1;
   order: Stage[];
   stages: Record<Stage, WorkflowStageState>;
+}
+
+export type WorkflowIntegrity = "verified" | "drifted" | "invalid" | null;
+
+export interface ArtifactIntegrity {
+  path: string;
+  status: "verified" | "drifted" | "missing" | "invalid";
+  approvedSha256?: string;
+  currentSha256?: string;
+  approvedBytes?: number;
+  currentBytes?: number;
+}
+
+export interface WorkflowIntegrityIssue {
+  code: "ledger_invalid" | "stage_order_invalid" | "approval_evidence_missing" | "approved_artifact_missing" | "approval_drift";
+  stage?: Stage;
+  path: string;
+  message: string;
+  approvedBy?: string;
+  approvedSha256?: string;
+  currentSha256?: string;
+  recommendedCommand?: string;
+}
+
+export interface WorkflowStageVerification {
+  stage: Stage;
+  status: "pending" | "approved" | "invalid";
+  integrity: WorkflowIntegrity;
+  approvedBy?: string;
+  approvedAt?: string;
+  artifacts: ArtifactIntegrity[];
+}
+
+export interface WorkflowVerificationReport {
+  schemaVersion: 1;
+  root: string;
+  passed: boolean;
+  issues: WorkflowIntegrityIssue[];
+  stages: WorkflowStageVerification[];
+}
+
+export interface WorkflowHistoryEvent {
+  type: string;
+  stage?: Stage;
+  actor?: string;
+  at?: string;
+  [key: string]: unknown;
 }
 
 export interface RemoteCatalogFile {

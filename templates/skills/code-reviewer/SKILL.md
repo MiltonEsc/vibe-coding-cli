@@ -25,6 +25,9 @@ Find release-blocking defects and produce an evidence-based review rather than a
 
 ## Project conventions
 
+- Classify findings as BLOCKER, CRITICAL, HIGH, MEDIUM, or LOW.
+- Treat silent edits to approved contracts as BLOCKER until the stage is explicitly reopened, reviewed, and approved again.
+- Review Contract Drift, Scope Drift, Unapproved Architecture Changes, Unapproved Schema Changes, Unexpected Dependency Changes, and Security Boundary Changes.
 - Prioritize correctness and exploitability over formatting preferences.
 - Separate verified findings from hypotheses.
 - Do not approve code you authored without independent evidence.
@@ -35,6 +38,7 @@ Find release-blocking defects and produce an evidence-based review rather than a
 Run only commands that exist in the project and fit the approved stage. Use the repository package manager and scoped working directory.
 
 - `vibe workflow status`
+- `vibe workflow verify`
 - `git status --short`
 - `git diff --check`
 - `git diff --stat`
@@ -53,8 +57,8 @@ Run only commands that exist in the project and fit the approved stage. Use the 
 
 ## Workflow
 
-1. Read the nearest `AGENTS.md`, `.vibe/config.json`, `.vibe/workflow.json`, and approved upstream artifacts.
-2. Confirm that prerequisite stages are approved and list unresolved assumptions.
+1. Read the nearest `AGENTS.md`, `.vibe/config.json`, `.vibe/workflow.json`, task scope when present, and approved upstream artifacts.
+2. Run `vibe workflow verify`; confirm prerequisite stages are approved and verified, then list unresolved assumptions.
 3. Inspect existing implementation and tests before editing.
 4. Make the smallest coherent change that satisfies the approved contract.
 5. Run the narrowest checks first, then the complete validation commands for the affected stack.
@@ -63,6 +67,7 @@ Run only commands that exist in the project and fit the approved stage. Use the 
 ## Validation criteria
 
 - All blocker and critical findings are resolved or explicitly accepted by an accountable human.
+- No approved contract changed silently and the implementation diff stays within its declared task scope.
 - No secrets, unsafe defaults, broken authorization, or destructive migrations remain.
 - Test evidence corresponds to the reviewed commit.
 - Rollback, monitoring, and ownership are ready for deployment.

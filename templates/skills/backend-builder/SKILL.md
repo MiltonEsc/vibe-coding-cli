@@ -25,6 +25,8 @@ Build a testable backend that preserves domain invariants and exposes stable con
 
 ## Project conventions
 
+- Declare task scope, allowed files, and the approved contracts being consumed before editing.
+- Run `vibe workflow verify`. Never modify an approved upstream contract as an implementation side effect; stop and request an explicit reopen when necessary.
 - Keep domain logic independent from transport and persistence where practical.
 - Validate at trust boundaries and authorize every protected operation.
 - Use structured errors and logs without leaking secrets.
@@ -35,6 +37,7 @@ Build a testable backend that preserves domain invariants and exposes stable con
 Run only commands that exist in the project and fit the approved stage. Use the repository package manager and scoped working directory.
 
 - `vibe workflow status`
+- `vibe workflow verify`
 - `npm test`
 - `pnpm test`
 - `uv run pytest`

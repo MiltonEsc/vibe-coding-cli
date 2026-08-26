@@ -39,13 +39,14 @@ Follow this exact sequence:
 
 For each stage:
 
-1. Run `vibe workflow status` and verify every prerequisite stage is approved.
+1. Run `vibe workflow status` and `vibe workflow verify`; verify every prerequisite stage is approved and has `verified` integrity.
 2. Read the nearest `AGENTS.md` and the artifacts approved in earlier stages.
-3. Select the specialist Skill for the stage and any stack-specific Skill.
-4. State inputs, assumptions, expected outputs, commands, and validation criteria before implementation.
-5. Produce the artifact and implementation evidence.
-6. Run deterministic checks and record exact commands and results.
-7. Present a stage summary with unresolved risks and request approval. Never self-approve.
+3. Inspect the active task scope when `.vibe/tasks/` exists, then state the task objective, allowed files or areas, branch, owner, and protected contracts.
+4. Select the specialist Skill for the stage and any stack-specific Skill.
+5. State inputs, assumptions, expected outputs, commands, and validation criteria before implementation.
+6. Produce the artifact and implementation evidence.
+7. Run deterministic checks and record exact commands and results.
+8. Present a stage summary with unresolved risks and request approval. Never self-approve.
 
 If a stage is truly not applicable, document why in that stage artifact and require explicit approval of the not-applicable decision. Never skip it silently.
 
@@ -65,6 +66,9 @@ Read only the specialist Skills needed for the current stage. Do not load or exe
 ## Project conventions
 
 - Treat `requirements.md` as the scope contract, `architecture.md` as the system contract, and `design.md` as the experience contract.
+- Treat every approved upstream artifact as immutable during downstream work. Never modify one as a side effect of implementation.
+- If work requires a contract change, stop, identify the contract and affected downstream stages, and request explicit authorization to reopen it. Do not run reopen automatically.
+- Stay inside the declared task scope and focused branch. Explain any necessary scope expansion before editing unrelated areas.
 - Give requirements and acceptance criteria stable identifiers and preserve them in tests and review evidence.
 - Keep generated files, migrations, API contracts, and deployment configuration under version control.
 - Prefer the repository package manager and existing commands; do not mix lockfile ecosystems.
@@ -75,6 +79,7 @@ Read only the specialist Skills needed for the current stage. Do not load or exe
 ## Commands that may be proposed
 
 - `vibe workflow status`
+- `vibe workflow verify`
 - `vibe doctor`
 - `vibe skills audit`
 - Stack-specific lint, type-check, test, build, migration, and local smoke-test commands listed by the selected specialist Skill
@@ -96,6 +101,7 @@ Do not run `vibe workflow approve` on behalf of the approver. Do not deploy prod
 Before presenting the project as deployment-ready, verify all of the following:
 
 - Every mandatory stage is approved in order, with no silent skips.
+- Every approved stage reports `verified` integrity and no contract or task scope drift remains.
 - Every in-scope requirement maps to implementation and test evidence.
 - Architecture, database, API, UI, and deployment artifacts agree on boundaries and contracts.
 - Authorization, validation, privacy, accessibility, failure modes, rollback, and observability have evidence.

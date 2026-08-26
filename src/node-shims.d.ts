@@ -17,6 +17,7 @@ declare module "node:crypto" {
 
 declare module "node:fs/promises" {
   export const access: any;
+  export const appendFile: any;
   export const cp: any;
   export const lstat: any;
   export const mkdir: any;
@@ -26,6 +27,14 @@ declare module "node:fs/promises" {
   export const rm: any;
   export const stat: any;
   export const writeFile: any;
+}
+
+declare module "node:child_process" {
+  export const execFile: any;
+}
+
+declare module "node:util" {
+  export const promisify: any;
 }
 
 declare module "node:path" {
