@@ -11,7 +11,7 @@ Implement a Next.js frontend with deliberate rendering, data, caching, and secur
 
 ## Expected input
 
-- Approved design.md and frontend requirements
+- Approved `.vibe/artifacts/design.md` and frontend requirements
 - Backend contracts and authentication model
 - Supported browsers, performance goals, and deployment target
 - Existing apps/web conventions and AGENTS.md
@@ -21,7 +21,7 @@ Implement a Next.js frontend with deliberate rendering, data, caching, and secur
 - Next.js routes, layouts, components, handlers, and configuration
 - Typed data access and explicit loading/error/not-found states
 - Tests for critical behavior
-- Updated frontend.md or implementation notes
+- Updated `.vibe/artifacts/frontend.md` or implementation notes
 
 ## Project conventions
 

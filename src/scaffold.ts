@@ -1,5 +1,6 @@
 import { cp, mkdir, readdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { DEFAULT_ARTIFACTS_DIRECTORY } from "./artifacts.js";
 import { STACK_SKILLS, STAGE_SKILLS } from "./constants.js";
 import { BUNDLED_SKILLS_ROOT, exists, safeJoin } from "./paths.js";
 import { projectTextFiles } from "./templates.js";
@@ -76,13 +77,14 @@ export async function initializeProject(target: string, options: InitOptions): P
   const stacks = validateStacks(options.stacks ?? []);
   const skills = selectedSkills(stacks);
   const createdAt = new Date().toISOString();
-  const ctx = { projectName, packageManager: options.packageManager, stacks, createdAt, prompt: options.prompt };
+  const ctx = { projectName, packageManager: options.packageManager, stacks, createdAt, prompt: options.prompt, artifactsDirectory: DEFAULT_ARTIFACTS_DIRECTORY };
   const textFiles = projectTextFiles(ctx);
 
   const config: VibeConfig = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     projectName,
     createdAt,
+    artifactsDirectory: DEFAULT_ARTIFACTS_DIRECTORY,
     packageManager: options.packageManager,
     stacks,
     skillsDirectory: ".agents/skills",

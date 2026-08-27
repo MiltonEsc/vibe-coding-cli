@@ -14,11 +14,11 @@ Convert a project brief into an implementation-ready contract without inventing 
 - Project brief and target users
 - Business goals, constraints, budget, and deadline
 - Known integrations, compliance needs, and non-goals
-- Existing requirements.md when refining a project
+- Existing `.vibe/artifacts/requirements.md` when refining a schema v2 project
 
 ## Required result
 
-- requirements.md with goals, personas, user stories, functional and non-functional requirements
+- `.vibe/artifacts/requirements.md` with goals, personas, user stories, functional and non-functional requirements
 - Prioritized acceptance criteria with stable identifiers
 - Assumptions, risks, dependencies, non-goals, and open questions
 - A requirements-to-test traceability seed
@@ -38,8 +38,8 @@ Run only commands that exist in the project and fit the approved stage. Use the 
 
 - `vibe workflow status`
 - `vibe workflow verify`
-- `git diff -- requirements.md`
-- `rg "TBD|TODO|OPEN" requirements.md`
+- `git diff -- .vibe/artifacts/requirements.md`
+- `rg "TBD|TODO|OPEN" .vibe/artifacts/requirements.md`
 
 ## Safety boundaries
 
@@ -69,4 +69,4 @@ Run only commands that exist in the project and fit the approved stage. Use the 
 
 ## Handoff
 
-Hand requirements.md and open decisions to software-architect. Do not approve the stage; present evidence for human or CI approval.
+Hand `.vibe/artifacts/requirements.md` and open decisions to software-architect. Do not approve the stage; present evidence for human or CI approval.

@@ -11,7 +11,7 @@ Create a migration-first Supabase data layer that denies access by default and i
 
 ## Expected input
 
-- Approved database.md and tenancy model
+- Approved `.vibe/artifacts/database.md` and tenancy model
 - Actor roles and operation-level authorization rules
 - Query patterns, retention, and storage requirements
 - Existing supabase migrations and config
@@ -64,7 +64,7 @@ Run only commands that exist in the project and fit the approved stage. Use the 
 - Anonymous, authenticated, owner, non-owner, and privileged paths are tested where applicable.
 - Every migration succeeds from a clean local database.
 - Policies prevent cross-tenant access and privilege escalation.
-- Generated types and database.md match the final schema.
+- Generated types and `.vibe/artifacts/database.md` match the final schema.
 
 ## Handoff
 

@@ -28,7 +28,7 @@ export const STACK_SKILLS: Record<KnownStack, string> = {
   "github-actions": "github-actions-deployer",
 };
 
-export const STAGE_ARTIFACTS: Record<Stage, string[]> = {
+export const STAGE_ARTIFACT_FILES: Record<Stage, string[]> = {
   requirements: ["requirements.md"],
   architecture: ["architecture.md"],
   database: ["database.md"],
@@ -38,6 +38,8 @@ export const STAGE_ARTIFACTS: Record<Stage, string[]> = {
   review: ["review.md"],
   deployment: ["deployment.md"],
 };
+
+export const ARTIFACT_FILES = [...new Set(Object.values(STAGE_ARTIFACT_FILES).flat())];
 
 export const REQUIRED_SKILL_HEADINGS = [
   "expected input",

@@ -11,14 +11,14 @@ Create the smallest architecture that satisfies approved requirements and makes 
 
 ## Expected input
 
-- Approved requirements.md
+- Approved `.vibe/artifacts/requirements.md`
 - Stack and hosting constraints from .vibe/config.json
-- Existing architecture.md and ADRs
+- Existing `.vibe/artifacts/architecture.md` and ADRs
 - Operational, security, scale, and compliance constraints
 
 ## Required result
 
-- architecture.md with context, containers, components, interfaces, and data flow
+- `.vibe/artifacts/architecture.md` with context, containers, components, interfaces, and data flow
 - Architecture decision records for consequential choices
 - Threat boundaries, failure modes, observability, and deployment topology
 - A mapping from requirements to components
@@ -38,8 +38,8 @@ Run only commands that exist in the project and fit the approved stage. Use the 
 
 - `vibe workflow status`
 - `vibe workflow verify`
-- `git diff -- architecture.md docs/adr`
-- `rg "TBD|TODO|OPEN" architecture.md docs/adr`
+- `git diff -- .vibe/artifacts/architecture.md docs/adr`
+- `rg "TBD|TODO|OPEN" .vibe/artifacts/architecture.md docs/adr`
 
 ## Safety boundaries
 
@@ -69,4 +69,4 @@ Run only commands that exist in the project and fit the approved stage. Use the 
 
 ## Handoff
 
-Hand architecture.md and ADRs to database-designer and backend-builder. Surface assumptions requiring human approval.
+Hand `.vibe/artifacts/architecture.md` and ADRs to database-designer and backend-builder. Surface assumptions requiring human approval.

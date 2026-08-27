@@ -25,6 +25,7 @@ Vibe CLI is a zero-runtime-dependency Node.js 22 command-line tool written in Ty
 - Keep runtime dependencies at zero unless a concrete security and maintenance review justifies one.
 - Use Node.js native APIs and ESM.
 - Preserve strict path containment, checksum verification, size limits, no-executable policy, audit-before-install, and atomic remote Skill installation.
+- Resolve workflow artifacts through project configuration; schema v1 uses the root and schema v2 uses the validated `artifactsDirectory`.
 - Never add automatic dependency installation or remote execution to `vibe init`.
 - Update tests for workflow gates, security controls, scaffold structure, and CLI parsing.
 - Keep Skill frontmatter to `name` and `description`; use lowercase kebab-case names.

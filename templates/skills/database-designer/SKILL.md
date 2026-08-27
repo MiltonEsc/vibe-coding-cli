@@ -11,14 +11,14 @@ Produce a secure, evolvable data contract before backend features depend on it.
 
 ## Expected input
 
-- Approved requirements.md and architecture.md
+- Approved `.vibe/artifacts/requirements.md` and `.vibe/artifacts/architecture.md`
 - Data ownership, tenancy, retention, and compliance rules
 - Expected query and write patterns
 - Current schema and migration history when modifying a project
 
 ## Required result
 
-- database.md with entities, relationships, invariants, access model, and lifecycle
+- `.vibe/artifacts/database.md` with entities, relationships, invariants, access model, and lifecycle
 - Versioned migrations and rollback notes when a database is selected
 - Indexes justified by query patterns
 - Representative seed or fixture strategy without production secrets
@@ -41,7 +41,7 @@ Run only commands that exist in the project and fit the approved stage. Use the 
 - `supabase db lint`
 - `supabase db diff --local`
 - `supabase test db`
-- `git diff -- database.md supabase migrations`
+- `git diff -- .vibe/artifacts/database.md supabase migrations`
 
 ## Safety boundaries
 
@@ -71,4 +71,4 @@ Run only commands that exist in the project and fit the approved stage. Use the 
 
 ## Handoff
 
-Hand database.md, migrations, and data contracts to the selected database and backend Skills.
+Hand `.vibe/artifacts/database.md`, migrations, and data contracts to the selected database and backend Skills.

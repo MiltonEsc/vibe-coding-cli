@@ -4,6 +4,8 @@
 
 ```text
 vibe init <nombre> [opciones]
+vibe next [directorio] [--json]
+vibe migrate [directorio] [--dry-run]
 vibe doctor [directorio] [--json]
 vibe --version
 vibe --help
@@ -18,6 +20,10 @@ Opciones comunes de `init`:
 | `--preset <nombre>` | Seleccion coordinada de stacks. |
 | `--stack <lista>` | Stacks conocidos o personalizados separados por coma. |
 | `--package-manager <nombre>` | Gestor registrado para el proyecto. |
+| `--dry-run` | Resume lo que se generaria sin escribir archivos. |
+| `--verbose` | Con `--dry-run`, tambien enumera todos los archivos planeados. |
+
+`vibe next` muestra la etapa activa, archivos, Skill recomendada, bloqueos, prompt para el agente, validacion siguiente y quien debe aprobar.
 
 ## Workflow
 
@@ -25,7 +31,7 @@ Opciones comunes de `init`:
 vibe workflow status [directorio] [--json]
 vibe workflow verify [directorio] [--json]
 vibe workflow history [etapa] [directorio] [--json]
-vibe workflow approve <etapa> --by <persona> [directorio]
+vibe workflow approve <etapa> --approver <persona> [directorio]
 vibe workflow reopen <etapa> --reason <motivo> [--actor <persona>] [directorio]
 ```
 
@@ -45,4 +51,6 @@ Consulta la ayuda instalada para opciones exactas:
 ```bash
 vibe --help
 vibe workflow --help
+vibe workflow status --help
+vibe skills list --help
 ```
