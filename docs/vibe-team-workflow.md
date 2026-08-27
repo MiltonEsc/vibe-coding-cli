@@ -8,18 +8,21 @@ Approved artifacts are the team's shared truth:
 
 | Artifact | Contract |
 | --- | --- |
-| `requirements.md` | Product scope and acceptance |
-| `architecture.md` | System boundaries and decisions |
-| `database.md` | Data ownership, schema, and migration rules |
-| `design.md` | User experience and accessibility |
-| `backend.md`, `frontend.md`, `testing.md`, `review.md`, `deployment.md` | Stage-specific implementation and evidence |
+| `.vibe/artifacts/requirements.md` | Product scope and acceptance |
+| `.vibe/artifacts/architecture.md` | System boundaries and decisions |
+| `.vibe/artifacts/database.md` | Data ownership, schema, and migration rules |
+| `.vibe/artifacts/design.md` | User experience and accessibility |
+| Other files in `.vibe/artifacts/` | Stage-specific implementation and evidence |
 
 Before implementation, every developer or assistant runs:
 
 ```bash
+vibe next
 vibe workflow status
 vibe workflow verify
 ```
+
+`vibe next` identifies the current contract, recommended Skill, unresolved markers, and accountable review action. The authoring assistant does not approve its own work; use a different human reviewer, or CI only when the team has explicitly configured CI as the approval gate.
 
 An approved stage with changed evidence reports `drifted`. Vibe does not silently convert it to pending because reopening is a human governance decision.
 
@@ -52,7 +55,7 @@ An assistant must never modify an approved upstream contract as a side effect. I
 ```text
 Contract change required.
 
-Affected contract: architecture.md
+Affected contract: .vibe/artifacts/architecture.md
 Reason: the requested implementation changes an authentication boundary.
 Current stage: backend
 Affected downstream stages: database, backend, frontend, testing, review, deployment
@@ -90,11 +93,11 @@ Vibe does not configure repository settings automatically. Git and the hosting p
 Do not invent owners. Copy only the applicable lines and replace placeholders with real teams:
 
 ```text
-requirements.md  @product-team
-architecture.md  @architecture-team
-database.md      @backend-team
-design.md        @design-team
-deployment.md    @platform-team
+.vibe/artifacts/requirements.md  @product-team
+.vibe/artifacts/architecture.md  @architecture-team
+.vibe/artifacts/database.md      @backend-team
+.vibe/artifacts/design.md        @design-team
+.vibe/artifacts/deployment.md    @platform-team
 ```
 
 Unconfigured CODEOWNERS is not a `vibe doctor` error.

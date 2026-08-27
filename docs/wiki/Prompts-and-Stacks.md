@@ -1,6 +1,6 @@
 # Prompts y stacks
 
-Los stacks son opcionales. Sirven para agregar estructura, instrucciones y Skills especializadas cuando la tecnologia ya esta decidida. No limitan las tecnologias que puede documentar o usar el proyecto.
+Los stacks son opcionales. Sirven para registrar decisiones, ajustar instrucciones y agregar Skills especializadas cuando la tecnologia ya esta decidida. No crean carpetas de aplicacion, instalan dependencias ni limitan las tecnologias que puede documentar o usar el proyecto.
 
 ## Sin stack
 
@@ -36,7 +36,7 @@ Puedes registrar identificadores personalizados en minusculas:
 vibe init realtime-app --stack react,vite,hono,postgresql,redis,websockets --package-manager bun
 ```
 
-Vibe registra esas decisiones, pero no inventa una Skill especializada ni comandos de validacion para una tecnologia desconocida. El equipo debe definirlos en `architecture.md`, `AGENTS.md` y los documentos de etapa.
+Vibe registra esas decisiones, pero no inventa una Skill especializada ni comandos de validacion para una tecnologia desconocida. El equipo debe definirlos en `.vibe/artifacts/architecture.md`, `AGENTS.md` y los documentos de etapa.
 
 ## Cambiar el stack despues
 
@@ -44,5 +44,5 @@ No edites una aprobacion silenciosamente. Actualiza la arquitectura, reabre la e
 
 ```bash
 vibe workflow reopen architecture --reason "Migracion de REST a eventos" --actor "Ana"
-vibe workflow approve architecture --by "Carlos"
+vibe workflow approve architecture --approver "Carlos"
 ```

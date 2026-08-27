@@ -18,7 +18,7 @@ Find release-blocking defects and produce an evidence-based review rather than a
 
 ## Required result
 
-- review.md with findings ordered by severity and file location
+- `.vibe/artifacts/review.md` with findings ordered by severity and file location
 - Security and privacy review with threat-boundary coverage
 - Release blockers, required fixes, and residual risks
 - Explicit go, conditional-go, or no-go recommendation
@@ -74,4 +74,4 @@ Run only commands that exist in the project and fit the approved stage. Use the 
 
 ## Handoff
 
-Hand review.md, accepted risks, and the reviewed commit identifier to deployment-engineer.
+Hand `.vibe/artifacts/review.md`, accepted risks, and the reviewed commit identifier to deployment-engineer.

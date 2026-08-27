@@ -13,21 +13,21 @@ Coordinate specialist Skills without skipping decisions, mixing stage responsibi
 
 - A project brief with users, goals, constraints, non-goals, and success criteria.
 - A selected stack in `.vibe/config.json` or an explicit request to propose one.
-- Existing `AGENTS.md`, `design.md`, workflow state, source code, and project artifacts when modifying a repository.
+- Existing `AGENTS.md`, `.vibe/artifacts/design.md`, workflow state, source code, and project artifacts when modifying a repository.
 - Explicit human decisions for unresolved product, security, compliance, cost, and production-release questions.
 
 ## Required result
 
 Produce and maintain these artifacts in order:
 
-1. `requirements.md`
-2. `architecture.md` and consequential ADRs
-3. `database.md` plus migrations or schema artifacts when applicable
-4. `backend.md` plus backend contracts and implementation
-5. `design.md` and `frontend.md` plus frontend implementation
-6. `testing.md` plus automated evidence
-7. `review.md` with severity-ordered correctness and security findings
-8. `deployment.md` plus reviewed delivery automation
+1. `.vibe/artifacts/requirements.md`
+2. `.vibe/artifacts/architecture.md` and consequential ADRs
+3. `.vibe/artifacts/database.md` plus migrations or schema artifacts when applicable
+4. `.vibe/artifacts/backend.md` plus backend contracts and implementation
+5. `.vibe/artifacts/design.md` and `.vibe/artifacts/frontend.md` plus frontend implementation
+6. `.vibe/artifacts/testing.md` plus automated evidence
+7. `.vibe/artifacts/review.md` with severity-ordered correctness and security findings
+8. `.vibe/artifacts/deployment.md` plus reviewed delivery automation
 
 Also maintain `.vibe/workflow.json` as the machine-readable stage ledger. Do not edit it to impersonate approval; use the CLI approval command only after an accountable human or CI gate accepts the evidence.
 
@@ -65,7 +65,7 @@ Read only the specialist Skills needed for the current stage. Do not load or exe
 
 ## Project conventions
 
-- Treat `requirements.md` as the scope contract, `architecture.md` as the system contract, and `design.md` as the experience contract.
+- Treat `.vibe/artifacts/requirements.md` as the scope contract, `.vibe/artifacts/architecture.md` as the system contract, and `.vibe/artifacts/design.md` as the experience contract.
 - Treat every approved upstream artifact as immutable during downstream work. Never modify one as a side effect of implementation.
 - If work requires a contract change, stop, identify the contract and affected downstream stages, and request explicit authorization to reopen it. Do not run reopen automatically.
 - Stay inside the declared task scope and focused branch. Explain any necessary scope expansion before editing unrelated areas.

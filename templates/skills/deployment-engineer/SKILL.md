@@ -11,14 +11,14 @@ Make deployment repeatable and reversible without exposing secrets or bypassing 
 
 ## Expected input
 
-- Approved review.md and tested commit identifier
+- Approved `.vibe/artifacts/review.md` and tested commit identifier
 - Target environments and hosting constraints
 - Migration, configuration, and secret requirements
 - SLOs, alerts, ownership, and rollback conditions
 
 ## Required result
 
-- deployment.md with release, migration, verification, rollback, and incident steps
+- `.vibe/artifacts/deployment.md` with release, migration, verification, rollback, and incident steps
 - CI/CD configuration with least-privilege permissions
 - Environment variable inventory using names only
 - Post-deploy smoke checks and monitoring links or placeholders
@@ -71,4 +71,4 @@ Run only commands that exist in the project and fit the approved stage. Use the 
 
 ## Handoff
 
-Present deployment.md and verification evidence. Never trigger production merely because prior stages passed.
+Present `.vibe/artifacts/deployment.md` and verification evidence. Never trigger production merely because prior stages passed.

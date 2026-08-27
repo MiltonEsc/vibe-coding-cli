@@ -11,7 +11,7 @@ Build a testable backend that preserves domain invariants and exposes stable con
 
 ## Expected input
 
-- Approved requirements.md, architecture.md, and database.md
+- Approved `.vibe/artifacts/requirements.md`, `.vibe/artifacts/architecture.md`, and `.vibe/artifacts/database.md`
 - API consumers and contract format
 - Selected backend stack and repository conventions
 - Existing tests and service boundaries

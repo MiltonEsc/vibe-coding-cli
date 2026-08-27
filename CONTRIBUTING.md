@@ -43,7 +43,7 @@ node dist/cli.js init sample-project --preset full-stack --dry-run
 
 ## Testing expectations
 
-Changes that affect workflow gates, generated project structure, stack selection, security controls, remote Skill installation, or CLI parsing should include regression coverage in `test/`.
+Changes that affect workflow gates, generated project structure, project schema migration, stack selection, security controls, remote Skill installation, or CLI parsing should include regression coverage in `test/`.
 
 The project uses Node's built-in test runner. The main validation command is:
 

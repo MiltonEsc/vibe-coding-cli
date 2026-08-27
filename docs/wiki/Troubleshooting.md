@@ -5,8 +5,8 @@
 El comando se ejecuto fuera del proyecto generado.
 
 ```bash
-vibe init world-button
-cd world-button
+vibe init my-product
+cd my-product
 vibe doctor
 ```
 
@@ -25,7 +25,7 @@ No es un error. El proyecto se creo en modo neutral para decidir tecnologias dur
 El contenido aprobado cambio. Consulta la diferencia en Git, reabre la etapa con una razon y solicita una nueva revision.
 
 ```bash
-git diff -- requirements.md
+git diff -- .vibe/artifacts/requirements.md
 vibe workflow reopen requirements --reason "Alcance actualizado" --actor "Milton"
 ```
 

@@ -9,10 +9,10 @@ npm install -g @vibe-coding-cli/cli
 vibe --version
 vibe init mi-app
 cd mi-app
-vibe doctor
+vibe next
 ```
 
-El proyecto generado incluye contratos como `requirements.md`, `architecture.md`, `AGENTS.md`, Skills especializadas y el ledger `.vibe/workflow.json`.
+El proyecto generado incluye contratos bajo `.vibe/artifacts/`, `AGENTS.md`, Skills especializadas y el ledger `.vibe/workflow.json`. Solo `.agents/` y `.vibe/` se crean como carpetas raiz.
 
 ## Recorrido recomendado
 
@@ -24,6 +24,6 @@ El proyecto generado incluye contratos como `requirements.md`, `architecture.md`
 
 ## Version actual
 
-La version `0.3.0` incorpora verificacion de integridad de aprobaciones, historial auditable y diagnosticos estructurados para CI.
+La version `0.4.0` organiza los contratos en `.vibe/artifacts/`, incorpora migracion segura desde schema v1, agrega `vibe next` y distingue integridad de progreso.
 
-Consulta [Novedades de v0.3.0](Release-0.3.0) para los detalles y ejemplos de migracion.
+Consulta [Novedades de v0.4.0](Release-0.4.0) para los detalles y ejemplos de migracion.

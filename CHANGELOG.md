@@ -4,6 +4,33 @@ All notable changes to Vibe CLI will be documented in this file.
 
 The project follows semantic versioning for published npm releases.
 
+## [0.4.0] - 2026-08-27
+
+### Added
+
+- Vibe project schema v2 with a configurable, path-safe `artifactsDirectory`.
+- `vibe migrate [directory] [--dry-run]` for explicit schema v1 to v2 migration.
+- `vibe next [directory] [--json]` to identify the current stage, artifact, recommended Skill, blockers, validation command, and accountable approval action.
+- Central artifact resolution shared by scaffold, workflow, doctor, and migration.
+
+### Changed
+
+- New projects store the nine workflow artifacts under `.vibe/artifacts/` instead of the repository root.
+- New projects create only `.agents/` and `.vibe/` as root directories; application and infrastructure directories are created later from approved architecture.
+- Initial cross-stack root files are limited to `.gitignore`, `AGENTS.md`, and `README.md`; contribution, security-policy, and environment-example files are deferred until project decisions exist.
+- Generated `AGENTS.md`, nested guidance, project README, and first-party Skills reference the schema v2 artifact paths.
+- Initialization and dry-run lead with decisions and the next three steps; `--verbose` lists every planned file path.
+- Workflow verification reports approval integrity separately from completion progress, including `0/8 stages approved; incomplete` for a fresh project.
+- Command-specific help is available for workflow and Skills subcommands.
+- Preset help explains the selected technologies, while no preset explicitly defers stack decisions to architecture.
+- Schema v1 projects remain supported by doctor and all workflow commands.
+
+### Security
+
+- Migration moves only known Vibe artifacts and rejects collisions, unsafe evidence, traversal, absolute paths, and symlinked artifact directories.
+- Approved SHA-256 evidence is retained while trusted paths are transformed during migration.
+- Migration uses preflight checks, temporary metadata files, and best-effort rollback without executing repository commands.
+
 ## [0.3.0] - 2026-08-26
 
 ### Added
@@ -58,6 +85,7 @@ The project follows semantic versioning for published npm releases.
 - Initial Vibe CLI implementation.
 - Project scaffolding, workflow artifacts, first-party Skills, and core validation commands.
 
+[0.4.0]: https://github.com/MiltonEsc/vibe-coding-cli/releases/tag/v0.4.0
 [0.3.0]: https://github.com/MiltonEsc/vibe-coding-cli/releases/tag/v0.3.0
 [0.2.0]: https://github.com/MiltonEsc/vibe-coding-cli/releases/tag/v0.2.0
 [0.1.0]: https://github.com/MiltonEsc/vibe-coding-cli/releases/tag/v0.1.0

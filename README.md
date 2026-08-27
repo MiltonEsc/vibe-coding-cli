@@ -10,9 +10,9 @@ Vibe is a zero-runtime-dependency Node.js CLI that creates a safe, traceable pro
 
 It generates:
 
-- Hierarchical `AGENTS.md` files for the repository and selected subprojects.
-- A complete `design.md` experience contract.
-- Stage artifacts for requirements, architecture, database, backend, frontend, testing, review, and deployment.
+- A root `AGENTS.md` contract and reusable Skills without pre-creating application source directories.
+- A complete `.vibe/artifacts/design.md` experience contract.
+- Stage artifacts under `.vibe/artifacts/` for requirements, architecture, database, backend, frontend, testing, review, and deployment.
 - A machine-readable workflow ledger with explicit, ordered approval gates.
 - A first-party Skill library with an orchestrator and stack-specific builders.
 - An opt-in remote Skill catalog with host allowlisting, size limits, SHA-256 verification, static audit, provenance, and atomic installation.
@@ -35,6 +35,7 @@ Run without installing globally:
 ```bash
 npx @vibe-coding-cli/cli init my-product --preset full-stack
 cd my-product
+npx @vibe-coding-cli/cli next
 npx @vibe-coding-cli/cli doctor
 ```
 
@@ -45,6 +46,7 @@ npm install -g @vibe-coding-cli/cli
 vibe --version
 vibe init my-product --preset full-stack
 cd my-product
+vibe next
 vibe doctor
 ```
 
@@ -57,7 +59,7 @@ node dist/cli.js doctor my-product
 node dist/cli.js workflow status my-product
 ```
 
-With no `--preset` or `--stack`, Vibe creates the core contracts, workflow, and general Skills while deferring technology choices to the architecture stage. The explicit `full-stack` preset selects Next.js, FastAPI, Supabase, and GitHub Actions. It also installs the React component Skill because Next.js uses React.
+With no `--preset` or `--stack`, Vibe intentionally creates every delivery contract and the general Skills while deferring technology choices to the architecture stage. This is not an incomplete installation. The explicit `full-stack` preset selects Next.js, FastAPI, Supabase, and GitHub Actions and adds their specialized Skills, but it does not bootstrap source directories or install dependencies.
 
 ## Presets and stacks
 
@@ -81,9 +83,11 @@ Known stack selectors with bundled specializations:
 - `flutter`
 - `github-actions`
 
-Custom lowercase stack identifiers are accepted and recorded in `.vibe/config.json`, `AGENTS.md`, and project documentation. They use the general stage Skills and do not generate specialized directories or validation commands. Known stacks progressively add their bundled Skill and scoped structure. Vibe rejects incompatible known primary choices such as FastAPI and NestJS together, or Next.js and standalone React together.
+Custom lowercase stack identifiers are accepted and recorded in `.vibe/config.json`, `AGENTS.md`, and project documentation. They use the general stage Skills and do not generate specialized validation commands. Known stacks add their bundled Skill. Vibe rejects incompatible known primary choices such as FastAPI and NestJS together, or Next.js and standalone React together.
 
-Use `--prompt <text>` for a short brief or `--prompt-file <path>` for a substantial product prompt. The original brief is quoted in `requirements.md` as source material; Vibe does not guess architecture decisions or remove the review markers automatically.
+Use `--prompt <text>` for a short brief or `--prompt-file <path>` for a substantial product prompt. The original brief is quoted in `.vibe/artifacts/requirements.md` as source material; Vibe does not guess architecture decisions or remove the review markers automatically.
+
+`vibe init --dry-run` prints a short plan: artifact location, Skill count, stack decisions, root folders, and the next three steps. Add `--verbose` to audit every planned file.
 
 ## Generated structure
 
@@ -91,25 +95,25 @@ A project created with the `full-stack` preset contains this shape:
 
 ```text
 my-product/
+├── .gitignore
 ├── AGENTS.md
-├── requirements.md
-├── architecture.md
-├── database.md
-├── backend.md
-├── design.md
-├── frontend.md
-├── testing.md
-├── review.md
-├── deployment.md
-├── SECURITY.md
-├── CONTRIBUTING.md
-├── .env.example
+├── README.md
 ├── .vibe/
 │   ├── config.json
 │   ├── workflow.json
 │   ├── workflow-history.jsonl        # created on the first approval event
 │   ├── skills.lock.json
-│   └── provenance/
+│   ├── provenance/
+│   └── artifacts/
+│       ├── requirements.md
+│       ├── architecture.md
+│       ├── database.md
+│       ├── backend.md
+│       ├── design.md
+│       ├── frontend.md
+│       ├── testing.md
+│       ├── review.md
+│       └── deployment.md
 ├── .agents/
 │   └── skills/
 │       ├── full-stack-app-builder/
@@ -122,21 +126,22 @@ my-product/
 │       ├── code-reviewer/
 │       ├── deployment-engineer/
 │       └── selected stack Skills...
-├── apps/
-│   ├── web/AGENTS.md
-│   └── api/AGENTS.md
-├── packages/shared/
-├── supabase/
-│   ├── AGENTS.md
-│   ├── migrations/
-│   └── tests/
-├── tests/AGENTS.md
-└── .github/
-    ├── AGENTS.md
-    └── workflows/
+└── package.json                       # only when a selected JS stack needs it
 ```
 
-The closest `AGENTS.md` applies to its directory subtree and refines the root instructions. The files remain standard Markdown and do not depend on a proprietary parser.
+The initial cross-stack root surface is limited to `.gitignore`, `AGENTS.md`, and `README.md`. The only directories Vibe creates in the repository root are `.agents/` and `.vibe/`. Application, test, infrastructure, ADR, CI, contribution, security-policy, and environment-example files are created later when approved architecture and team policy make them concrete. Teams may add deeper `AGENTS.md` files when real source boundaries exist.
+
+### Migrating a v0.3 project
+
+Schema v1 projects with root-level artifacts continue to work unchanged. Preview and apply the explicit schema v2 migration when ready:
+
+```bash
+vibe migrate --dry-run
+vibe migrate
+vibe workflow verify
+```
+
+Migration moves only the nine Vibe-managed workflow artifacts, updates approval evidence paths without changing approved checksums, and refuses destination collisions or unsafe paths. Repository-standard files remain in the root.
 
 ## Mandatory workflow
 
@@ -149,6 +154,7 @@ requirements -> architecture -> database -> backend -> frontend -> testing -> re
 Every stage starts as `pending`. Approval requires all prior stages to be approved and the stage artifacts to be present, meaningful, and free of scaffold markers.
 
 ```bash
+vibe next
 vibe workflow status
 vibe workflow verify
 vibe workflow approve requirements --approver "alice@example.com" --note "Product review 42"
@@ -157,7 +163,9 @@ vibe workflow approve architecture --approver "architecture-review-ci"
 
 Approval records the approver, timestamp, file sizes, SHA-256 hashes, and optional Git commit, branch, and working-tree context. Immediately before persistence, Vibe rechecks the artifacts and ledger to prevent a concurrent change from receiving stale approval. An agent Skill is explicitly instructed not to approve itself.
 
-`vibe workflow verify` derives integrity from the current files and recorded evidence. An approved artifact that changes remains `approved` but reports `drifted`; verification and `doctor` fail until a human explicitly reopens the contract.
+`vibe workflow verify` derives integrity from the current files and recorded evidence. It reports approval integrity separately from progress, for example `0/8 stages approved; incomplete`. A valid empty ledger is not presented as a completed workflow. An approved artifact that changes remains `approved` but reports `drifted`; verification and `doctor` fail until a human explicitly reopens the contract.
+
+`vibe next` connects the workflow to the agent. It shows the current stage, files to edit, recommended `$skill`, unresolved blocker count, a ready-to-use prompt, the next validation command, and the accountable approval action. The authoring agent must not approve its own work; use a different human reviewer or CI only when the team explicitly configures CI as that gate.
 
 When an earlier decision changes, reopen that stage. Vibe invalidates all downstream approvals and appends an event to the workflow history.
 
@@ -188,14 +196,14 @@ Developer A + Agent A     Developer B + Agent B
                   main
 ```
 
-- **Contract-first:** `requirements.md`, `architecture.md`, `database.md`, and `design.md` become immutable upstream contracts once approved.
+- **Contract-first:** `.vibe/artifacts/requirements.md`, `.vibe/artifacts/architecture.md`, `.vibe/artifacts/database.md`, and `.vibe/artifacts/design.md` become immutable upstream contracts once approved.
 - **Branch-by-task:** each developer and assistant works on a focused branch with declared scope and avoids unrelated architecture, schema, dependency, or framework changes.
 - **PR-gated:** protect `main`, require pull requests, status checks, resolved conversations, and at least one accountable review. CODEOWNER review and dismissal of stale approvals are recommended.
 - **Explicit reopen:** an agent that discovers a necessary contract change stops, explains the impact, and requests authorization. It never edits the ledger or runs reopen silently.
 
 Git coordinates collaboration and merge. Vibe verifies that the contracts used by every branch still match their human approvals. See [Vibe Team Workflow](docs/vibe-team-workflow.md) for branch protection, task scope, CI, and multi-agent examples.
 
-## `design.md`
+## `.vibe/artifacts/design.md`
 
 The generated design contract covers:
 
@@ -207,7 +215,7 @@ The generated design contract covers:
 - Data and API dependencies.
 - Performance budgets, analytics, privacy constraints, decisions, and acceptance criteria.
 
-The frontend stage requires both `design.md` and `frontend.md` before approval.
+The frontend stage requires both `.vibe/artifacts/design.md` and `.vibe/artifacts/frontend.md` before approval.
 
 ## First-party Skills
 
@@ -295,13 +303,15 @@ vibe skills audit
 vibe skills audit --json
 ```
 
-`doctor` verifies required project files, stage order, state consistency, approval hashes, scoped `AGENTS.md` files, required stack Skills, and Skill audit results. Unresolved scaffold markers are warnings; approval drift, missing files, malformed workflow state, unsafe Skills, or broken stage ordering are errors. JSON output includes structured drift codes, stages, approvers, approved/current hashes, and the recommended reopen command.
+`doctor` verifies required project files, stage order, state consistency, approval hashes, project guidance, required stack Skills, and Skill audit results. Unresolved scaffold markers are warnings; approval drift, missing files, malformed workflow state, unsafe Skills, or broken stage ordering are errors. JSON output includes structured drift codes, stages, approvers, approved/current hashes, and the recommended reopen command.
 
 ## CLI reference
 
 ```text
 vibe init [directory] [--preset name] [--stack a,b] [--package-manager name]
-                         [--prompt text|--prompt-file path] [--force] [--dry-run]
+                         [--prompt text|--prompt-file path] [--force] [--dry-run] [--verbose]
+vibe next [directory] [--json]
+vibe migrate [directory] [--dry-run]
 vibe doctor [directory] [--json]
 vibe workflow status [directory] [--json]
 vibe workflow verify [directory] [--json]

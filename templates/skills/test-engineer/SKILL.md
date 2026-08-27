@@ -18,7 +18,7 @@ Demonstrate that the integrated system meets acceptance criteria and fails safel
 
 ## Required result
 
-- testing.md with strategy, environments, risks, and evidence
+- `.vibe/artifacts/testing.md` with strategy, environments, risks, and evidence
 - Requirements-to-test traceability matrix
 - Automated tests at appropriate layers
 - Defect list with severity, reproduction, expected behavior, and ownership
@@ -42,7 +42,7 @@ Run only commands that exist in the project and fit the approved stage. Use the 
 - `uv run pytest`
 - `flutter test`
 - `npx playwright test`
-- `git diff -- testing.md tests`
+- `git diff -- .vibe/artifacts/testing.md tests`
 
 ## Safety boundaries
 
@@ -72,4 +72,4 @@ Run only commands that exist in the project and fit the approved stage. Use the 
 
 ## Handoff
 
-Hand testing.md, test evidence, and defect status to code-reviewer.
+Hand `.vibe/artifacts/testing.md`, test evidence, and defect status to code-reviewer.

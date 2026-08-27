@@ -1,6 +1,6 @@
 ---
 name: react-component-builder
-description: "Design, implement, and validate reusable React components from design.md and project conventions. Use for component APIs, composition, state, forms, accessibility, responsive behavior, stories, and component tests."
+description: "Design, implement, and validate reusable React components from the configured design artifact and project conventions. Use for component APIs, composition, state, forms, accessibility, responsive behavior, stories, and component tests."
 ---
 
 # React Component Builder
@@ -11,7 +11,7 @@ Create focused components with predictable APIs and complete interaction states.
 
 ## Expected input
 
-- Approved component specification or design.md section
+- Approved component specification or `.vibe/artifacts/design.md` section
 - Design tokens and existing component inventory
 - Data and event contracts
 - Accessibility and browser requirements

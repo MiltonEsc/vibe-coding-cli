@@ -1,6 +1,6 @@
 ---
 name: frontend-builder
-description: "Implement accessible user interfaces from approved requirements, architecture, backend contracts, and design.md. Use at the frontend stage for flows, components, forms, state, errors, responsiveness, accessibility, and frontend tests."
+description: "Implement accessible user interfaces from approved requirements, architecture, backend contracts, and the configured design artifact. Use at the frontend stage for flows, components, forms, state, errors, responsiveness, accessibility, and frontend tests."
 ---
 
 # Frontend Builder
@@ -11,7 +11,7 @@ Translate approved product and design decisions into resilient, accessible inter
 
 ## Expected input
 
-- Approved requirements.md, architecture.md, and design.md
+- Approved `.vibe/artifacts/requirements.md`, `.vibe/artifacts/architecture.md`, and `.vibe/artifacts/design.md`
 - Backend contracts and representative data states
 - Selected web or mobile stack
 - Existing design system and component conventions

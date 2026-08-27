@@ -20,8 +20,8 @@ El comando termina con codigo distinto de cero cuando encuentra drift o un ledge
 ## Ejemplo de drift
 
 ```bash
-vibe workflow approve requirements --by "Ana"
-# Se modifica requirements.md despues de la aprobacion
+vibe workflow approve requirements --approver "Ana"
+# Se modifica .vibe/artifacts/requirements.md despues de la aprobacion
 vibe workflow verify
 vibe doctor
 ```
@@ -33,5 +33,5 @@ Para continuar:
 ```bash
 vibe workflow reopen requirements --reason "Se agrego recuperacion de cuenta" --actor "Ana"
 # Revision humana del nuevo contenido
-vibe workflow approve requirements --by "Pedro"
+vibe workflow approve requirements --approver "Pedro"
 ```

@@ -2,9 +2,9 @@ import { execFile } from "node:child_process";
 import { appendFile, mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
-import { STAGE_ARTIFACTS } from "./constants.js";
+import { loadProjectContext, stageArtifactPaths, validateArtifactFilePath, type ProjectContext } from "./artifacts.js";
 import { sha256, sha256File } from "./hash.js";
-import { exists, findProjectRoot, safeJoin } from "./paths.js";
+import { exists, findProjectRoot } from "./paths.js";
 import {
   STAGES,
   type ArtifactEvidence,
@@ -45,7 +45,7 @@ interface GitContext {
   workingTreeClean: boolean;
 }
 
-interface WorkflowSnapshot {
+interface WorkflowSnapshot extends ProjectContext {
   root: string;
   state: WorkflowState;
   ledgerSha256: string;
@@ -60,9 +60,10 @@ function workflowPath(root: string): string {
 }
 
 async function readWorkflowSnapshot(start?: string): Promise<WorkflowSnapshot> {
-  const root = await findProjectRoot(start);
+  const context = await loadProjectContext(start);
+  const { root } = context;
   const raw = await readFile(workflowPath(root), "utf8");
-  return { root, state: JSON.parse(raw) as WorkflowState, ledgerSha256: sha256(raw) };
+  return { ...context, state: JSON.parse(raw) as WorkflowState, ledgerSha256: sha256(raw) };
 }
 
 export async function loadWorkflow(start?: string): Promise<WorkflowSnapshot> {
@@ -114,11 +115,11 @@ async function readArtifact(target: string): Promise<{ content: string; sha256: 
   return { content: bytes.toString("utf8"), sha256: sha256(bytes), bytes: bytes.byteLength };
 }
 
-export async function validateStageArtifacts(root: string, stage: Stage): Promise<ArtifactValidation> {
+async function validateStageArtifacts(context: ProjectContext, stage: Stage): Promise<ArtifactValidation> {
   const errors: string[] = [];
   const evidence: ArtifactEvidence[] = [];
-  for (const relativePath of STAGE_ARTIFACTS[stage]) {
-    const target = safeJoin(root, relativePath);
+  for (const relativePath of stageArtifactPaths(context, stage)) {
+    const target = await validateArtifactFilePath(context.root, relativePath);
     if (!(await exists(target))) {
       errors.push(`${relativePath} is missing.`);
       continue;
@@ -145,8 +146,14 @@ function invalidStage(stage: Stage): WorkflowStageVerification {
   return { stage, status: "invalid", integrity: "invalid", artifacts: [] };
 }
 
+function workflowProgress(stages: WorkflowStageVerification[]): WorkflowVerificationReport["progress"] {
+  const approved = stages.filter((stage) => stage.status === "approved" && stage.integrity === "verified").length;
+  return { approved, total: STAGES.length, complete: approved === STAGES.length };
+}
+
 export async function verifyWorkflow(start?: string): Promise<WorkflowVerificationReport> {
-  const root = await findProjectRoot(start);
+  const context = await loadProjectContext(start);
+  const { root } = context;
   const issues: WorkflowIntegrityIssue[] = [];
   const stages: WorkflowStageVerification[] = [];
   let state: WorkflowState;
@@ -156,7 +163,8 @@ export async function verifyWorkflow(start?: string): Promise<WorkflowVerificati
     state = JSON.parse(raw) as WorkflowState;
   } catch (error) {
     issues.push({ code: "ledger_invalid", path: ".vibe/workflow.json", message: `Cannot read workflow ledger: ${(error as Error).message}` });
-    return { schemaVersion: 1, root, passed: false, issues, stages: STAGES.map(invalidStage) };
+    const invalidStages = STAGES.map(invalidStage);
+    return { schemaVersion: 1, root, passed: false, progress: workflowProgress(invalidStages), issues, stages: invalidStages };
   }
 
   if (state.schemaVersion !== 1 || JSON.stringify(state.order) !== JSON.stringify(STAGES)) {
@@ -200,7 +208,7 @@ export async function verifyWorkflow(start?: string): Promise<WorkflowVerificati
 
     const artifacts: ArtifactIntegrity[] = [];
     const evidence = Array.isArray(value.evidence) ? value.evidence : [];
-    const expectedPaths = STAGE_ARTIFACTS[stage];
+    const expectedPaths = stageArtifactPaths(context, stage);
     const evidencePaths = evidence.map((item) => item?.path);
     const approvalMetadataInvalid = typeof value.approvedBy !== "string" || !value.approvedBy.trim()
       || typeof value.approvedAt !== "string" || !value.approvedAt.trim();
@@ -227,7 +235,7 @@ export async function verifyWorkflow(start?: string): Promise<WorkflowVerificati
         artifacts.push({ path: relativePath, status: "invalid" });
         continue;
       }
-      const target = safeJoin(root, relativePath);
+      const target = await validateArtifactFilePath(root, relativePath);
       if (!(await exists(target))) {
         integrity = "drifted";
         artifacts.push({ path: relativePath, status: "missing", approvedSha256: approved.sha256, approvedBytes: approved.bytes });
@@ -292,7 +300,7 @@ export async function verifyWorkflow(start?: string): Promise<WorkflowVerificati
     });
   }
 
-  return { schemaVersion: 1, root, passed: issues.length === 0, issues, stages };
+  return { schemaVersion: 1, root, passed: issues.length === 0, progress: workflowProgress(stages), issues, stages };
 }
 
 export async function approveStage(stage: Stage, options: ApproveStageOptions): Promise<WorkflowState> {
@@ -314,7 +322,7 @@ export async function approveStage(stage: Stage, options: ApproveStageOptions): 
     throw new Error(`${stage} is already approved. Reopen it first to replace the approval evidence.`);
   }
 
-  const validation = await validateStageArtifacts(root, stage);
+  const validation = await validateStageArtifacts(snapshot, stage);
   if (!validation.valid) throw new Error(`Cannot approve ${stage}:\n- ${validation.errors.join("\n- ")}`);
   const priorHistory = await readWorkflowHistory(root);
   const previousApproval = [...priorHistory.events].reverse().find((event) =>
@@ -322,7 +330,8 @@ export async function approveStage(stage: Stage, options: ApproveStageOptions): 
   );
   await options.beforePersist?.();
 
-  const finalValidation = await validateStageArtifacts(root, stage);
+  const finalContext = await loadProjectContext(root);
+  const finalValidation = await validateStageArtifacts(finalContext, stage);
   if (!finalValidation.valid || !evidenceMatches(validation.evidence, finalValidation.evidence)) {
     throw new Error(`Cannot approve ${stage}; its artifacts changed during approval. Review the current files and approve again.`);
   }

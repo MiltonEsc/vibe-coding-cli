@@ -5,6 +5,7 @@
 - [Primer proyecto](Getting-Started)
 - [Prompts y stacks](Prompts-and-Stacks)
 - [Estructura generada](Generated-Structure)
+- [Migracion de v0.3](Migration)
 - [Workflow y aprobaciones](Workflow-and-Approvals)
 - [Integridad y drift](Integrity-and-Drift)
 - [Trabajo en equipo](Team-Development)
@@ -13,3 +14,4 @@
 - [Skills y seguridad](Skills-and-Security)
 - [Solucion de problemas](Troubleshooting)
 - [Novedades de v0.3.0](Release-0.3.0)
+- [Novedades de v0.4.0](Release-0.4.0)

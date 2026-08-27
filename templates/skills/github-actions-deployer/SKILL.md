@@ -11,7 +11,7 @@ Make CI/CD reproducible and constrained, with production protected by explicit a
 
 ## Expected input
 
-- Approved deployment.md and repository test commands
+- Approved `.vibe/artifacts/deployment.md` and repository test commands
 - Target environments, artifact strategy, and branch policy
 - Required secret names and identity provider constraints
 - Rollback and post-deploy verification steps
@@ -36,7 +36,7 @@ Run only commands that exist in the project and fit the approved stage. Use the 
 
 - `actionlint`
 - `yamllint .github/workflows`
-- `git diff -- .github/workflows deployment.md`
+- `git diff -- .github/workflows .vibe/artifacts/deployment.md`
 - `gh workflow view`
 
 ## Safety boundaries

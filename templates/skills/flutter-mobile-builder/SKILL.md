@@ -1,6 +1,6 @@
 ---
 name: flutter-mobile-builder
-description: "Build and validate Flutter mobile features from approved requirements and design.md. Use for navigation, widgets, state management, networking, local persistence, accessibility, platform behavior, tests, and debug builds."
+description: "Build and validate Flutter mobile features from approved requirements and the configured design artifact. Use for navigation, widgets, state management, networking, local persistence, accessibility, platform behavior, tests, and debug builds."
 ---
 
 # Flutter Mobile Builder
@@ -11,7 +11,7 @@ Implement predictable Flutter features with clear state, platform, accessibility
 
 ## Expected input
 
-- Approved mobile flows and design.md
+- Approved mobile flows and `.vibe/artifacts/design.md`
 - API contracts, authentication, and offline requirements
 - Supported platforms and minimum SDK versions
 - Existing apps/mobile conventions and AGENTS.md

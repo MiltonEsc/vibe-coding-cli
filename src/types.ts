@@ -29,8 +29,7 @@ export function isKnownStack(value: string): value is KnownStack {
 }
 export type PackageManager = "pnpm" | "npm" | "yarn" | "bun";
 
-export interface VibeConfig {
-  schemaVersion: 1;
+interface VibeConfigBase {
   projectName: string;
   createdAt: string;
   packageManager: PackageManager;
@@ -46,6 +45,18 @@ export interface VibeConfig {
     allowExecutableFiles: false;
   };
 }
+
+export interface VibeConfigV1 extends VibeConfigBase {
+  schemaVersion: 1;
+  artifactsDirectory?: never;
+}
+
+export interface VibeConfigV2 extends VibeConfigBase {
+  schemaVersion: 2;
+  artifactsDirectory: string;
+}
+
+export type VibeConfig = VibeConfigV1 | VibeConfigV2;
 
 export interface ArtifactEvidence {
   path: string;
@@ -105,6 +116,11 @@ export interface WorkflowVerificationReport {
   schemaVersion: 1;
   root: string;
   passed: boolean;
+  progress: {
+    approved: number;
+    total: number;
+    complete: boolean;
+  };
   issues: WorkflowIntegrityIssue[];
   stages: WorkflowStageVerification[];
 }
